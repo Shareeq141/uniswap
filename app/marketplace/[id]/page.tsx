@@ -20,7 +20,9 @@ import {
 import { supabase } from "@/lib/supabase";
 import { isSafePublicImageUrl } from "@/lib/utils";
 import { useAuth } from "@/lib/auth-context";
+import { addWishlistItem, fetchWishlistListingIds, removeWishlistItem } from "@/lib/wishlist";
 import Navbar from "@/components/Navbar";
+import WishlistButton from "@/components/WishlistButton";
 
 type Listing = {
   id: string;
@@ -78,6 +80,8 @@ export default function ListingDetailPage() {
   const [offeredItemText, setOfferedItemText] = useState("");
   const [sendingRequest, setSendingRequest] = useState(false);
   const [requestStatusMessage, setRequestStatusMessage] = useState<string | null>(null);
+  const [isSaved, setIsSaved] = useState(false);
+  const [savingWishlist, setSavingWishlist] = useState(false);
 
   useEffect(() => {
     if (!listingId) return;
@@ -175,6 +179,62 @@ export default function ListingDetailPage() {
       isMounted = false;
     };
   }, [listingId, user]);
+
+  useEffect(() => {
+    let active = true;
+    const timer = window.setTimeout(() => {
+      if (!user || !listingId) {
+        setIsSaved(false);
+        return;
+      }
+
+      void fetchWishlistListingIds(user.id).then(({ data, error: wishlistError }) => {
+        if (!active) return;
+        if (wishlistError) {
+          console.warn("Could not load listing wishlist state:", wishlistError.message);
+          return;
+        }
+        setIsSaved(data.includes(listingId));
+      });
+    }, 0);
+
+    return () => {
+      active = false;
+      window.clearTimeout(timer);
+    };
+  }, [listingId, user]);
+
+  async function toggleWishlist() {
+    if (!listingId) return;
+    if (!user) {
+      router.push("/login");
+      return;
+    }
+    if (savingWishlist) return;
+
+    setSavingWishlist(true);
+    try {
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !sessionData.session?.user || sessionData.session.user.id !== user.id) {
+        router.push("/login");
+        return;
+      }
+
+      const userId = sessionData.session.user.id;
+      const result = isSaved
+        ? await removeWishlistItem(userId, listingId)
+        : await addWishlistItem(userId, listingId);
+
+      if (result.error && result.error.code !== "23505") {
+        console.warn("Could not update listing wishlist:", result.error.message);
+        return;
+      }
+
+      setIsSaved((current) => !current);
+    } finally {
+      setSavingWishlist(false);
+    }
+  }
 
   async function handleSendRequest(offeredText?: string) {
     if (!item) return;
@@ -385,6 +445,12 @@ export default function ListingDetailPage() {
                   <span className="rounded-lg bg-slate-100 text-slate-700 px-2.5 py-1 text-xs font-semibold">
                     {item.condition}
                   </span>
+                  <WishlistButton
+                    saved={isSaved}
+                    loading={savingWishlist}
+                    onToggle={() => void toggleWishlist()}
+                    className="ml-auto h-9 w-9 border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-red-500"
+                  />
                 </div>
                 <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 leading-tight">
                   {item.title}

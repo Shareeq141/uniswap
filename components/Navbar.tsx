@@ -17,6 +17,7 @@ import {
   List,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
+import ProfileAvatar from "@/components/ProfileAvatar";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -127,6 +128,14 @@ export default function Navbar() {
             <div className="h-9 w-24 animate-pulse rounded-xl bg-slate-100" />
           ) : user ? (
             <div className="flex items-center gap-3">
+              <Link
+                href="/profile"
+                aria-label="Open your profile"
+                title="Profile"
+                className="rounded-xl ring-teal-200 transition hover:ring-2"
+              >
+                <ProfileAvatar profile={profile} user={user} />
+              </Link>
               <span className="max-w-[160px] truncate text-xs font-medium text-slate-500 bg-slate-50 border border-slate-200 px-2.5 py-1.5 rounded-lg">
                 {profile?.full_name || user.email}
               </span>
@@ -161,6 +170,17 @@ export default function Navbar() {
 
         {/* MOBILE MENU TOGGLE */}
         <div className="flex md:hidden items-center gap-2">
+          {user && (
+            <Link
+              href="/profile"
+              aria-label="Open your profile"
+              title="Profile"
+              className="rounded-xl ring-teal-200 transition hover:ring-2"
+            >
+              <ProfileAvatar profile={profile} user={user} />
+            </Link>
+          )}
+
           {typeof unreadCount === "number" && unreadCount > 0 && (
             <Link
               href="/messages"
@@ -236,9 +256,14 @@ export default function Navbar() {
           <div className="pt-3 border-t border-slate-100">
             {user ? (
               <div className="flex items-center justify-between pt-2">
-                <span className="truncate text-xs text-slate-500">
-                  {profile?.full_name || user.email}
-                </span>
+                <Link
+                  href="/profile"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex min-w-0 items-center gap-2 rounded-xl pr-3 text-xs text-slate-500 hover:text-slate-900"
+                >
+                  <ProfileAvatar profile={profile} user={user} />
+                  <span className="truncate">{profile?.full_name || user.email}</span>
+                </Link>
                 <button
                   type="button"
                   onClick={() => {

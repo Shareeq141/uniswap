@@ -185,7 +185,52 @@ DO $$ BEGIN
 END $$;
 
 
--- 3. CONTACT REQUESTS TABLE
+-- 3. WISHLIST ITEMS TABLE
+CREATE TABLE IF NOT EXISTS public.wishlist_items (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  listing_id UUID NOT NULL REFERENCES public.listings(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  CONSTRAINT wishlist_items_user_listing_key UNIQUE (user_id, listing_id)
+);
+
+CREATE INDEX IF NOT EXISTS wishlist_items_user_created_idx
+  ON public.wishlist_items (user_id, created_at DESC);
+
+ALTER TABLE public.wishlist_items ENABLE ROW LEVEL SECURITY;
+
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE tablename = 'wishlist_items' AND policyname = 'Users can view their own wishlist'
+  ) THEN
+    CREATE POLICY "Users can view their own wishlist"
+      ON public.wishlist_items FOR SELECT
+      USING (auth.uid() = user_id);
+  END IF;
+END $$;
+
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE tablename = 'wishlist_items' AND policyname = 'Users can add to their own wishlist'
+  ) THEN
+    CREATE POLICY "Users can add to their own wishlist"
+      ON public.wishlist_items FOR INSERT
+      WITH CHECK (auth.uid() = user_id);
+  END IF;
+END $$;
+
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE tablename = 'wishlist_items' AND policyname = 'Users can remove from their own wishlist'
+  ) THEN
+    CREATE POLICY "Users can remove from their own wishlist"
+      ON public.wishlist_items FOR DELETE
+      USING (auth.uid() = user_id);
+  END IF;
+END $$;
+
+
+-- 4. CONTACT REQUESTS TABLE
 CREATE TABLE IF NOT EXISTS public.contact_requests (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   listing_id UUID NOT NULL REFERENCES public.listings(id) ON DELETE CASCADE,

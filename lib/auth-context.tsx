@@ -27,6 +27,7 @@ type AuthContextType = {
   loading: boolean;
   unreadCount: number;
   requestCount: number;
+  refreshProfile: () => Promise<void>;
   refreshUnreadCount: () => Promise<void>;
   refreshRequestCount: () => Promise<void>;
   signOut: () => Promise<void>;
@@ -38,6 +39,7 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
   unreadCount: 0,
   requestCount: 0,
+  refreshProfile: async () => {},
   refreshUnreadCount: async () => {},
   refreshRequestCount: async () => {},
   signOut: async () => {},
@@ -116,6 +118,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.warn("Could not fetch unread count:", err);
     }
   }, [user]);
+
+  const refreshProfile = useCallback(async () => {
+    if (user) await loadProfile(user.id);
+  }, [loadProfile, user]);
 
   const refreshRequestCount = useCallback(async () => {
     if (!user) {
@@ -281,6 +287,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         loading,
         unreadCount,
         requestCount,
+        refreshProfile,
         refreshUnreadCount,
         refreshRequestCount,
         signOut,

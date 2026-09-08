@@ -3,11 +3,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import {
   ArrowLeftRight,
   Gift,
   GraduationCap,
-  Heart,
   Navigation,
   PackageOpen,
   Search,
@@ -15,8 +15,11 @@ import {
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { isSafePublicImageUrl } from "@/lib/utils";
+import { useAuth } from "@/lib/auth-context";
+import { addWishlistItem, fetchWishlistListingIds, removeWishlistItem } from "@/lib/wishlist";
 import Navbar from "@/components/Navbar";
 import LiveLocationControl, { LiveLocation } from "@/components/LiveLocationControl";
+import WishlistButton from "@/components/WishlistButton";
 
 export type Listing = {
   id: string;
@@ -64,6 +67,8 @@ function normalizeCoordinate(value: unknown, minimum: number, maximum: number): 
 }
 
 export default function MarketplacePage() {
+  const router = useRouter();
+  const { user } = useAuth();
   const [listings, setListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -72,6 +77,7 @@ export default function MarketplacePage() {
   const [selectedCondition, setSelectedCondition] = useState("All");
   const [exchangeFilter, setExchangeFilter] = useState<"All" | "Give Away" | "Swap">("All");
   const [savedIds, setSavedIds] = useState<string[]>([]);
+  const [wishlistLoadingIds, setWishlistLoadingIds] = useState<Set<string>>(new Set());
   const [userLocation, setUserLocation] = useState<LiveLocation | null>(null);
   const latestRequestRef = useRef(0);
 
@@ -145,6 +151,30 @@ export default function MarketplacePage() {
     return () => window.clearTimeout(timer);
   }, [loadListings, search, userLocation]);
 
+  useEffect(() => {
+    let active = true;
+    const timer = window.setTimeout(() => {
+      if (!user) {
+        setSavedIds([]);
+        return;
+      }
+
+      void fetchWishlistListingIds(user.id).then(({ data, error: wishlistError }) => {
+        if (!active) return;
+        if (wishlistError) {
+          console.warn("Could not load wishlist:", wishlistError.message);
+          return;
+        }
+        setSavedIds(data);
+      });
+    }, 0);
+
+    return () => {
+      active = false;
+      window.clearTimeout(timer);
+    };
+  }, [user]);
+
   const filteredListings = useMemo(() => {
     return listings.filter((item) => {
       const matchesCategory = selectedCategory === "All" || (item.category || "").toLowerCase() === selectedCategory.toLowerCase();
@@ -157,8 +187,41 @@ export default function MarketplacePage() {
     });
   }, [exchangeFilter, listings, selectedCategory, selectedCondition, userLocation]);
 
-  function toggleSaved(id: string) {
-    setSavedIds((previous) => previous.includes(id) ? previous.filter((item) => item !== id) : [...previous, id]);
+  async function toggleSaved(id: string) {
+    if (!user) {
+      router.push("/login");
+      return;
+    }
+
+    if (wishlistLoadingIds.has(id)) return;
+    setWishlistLoadingIds((current) => new Set(current).add(id));
+
+    try {
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !sessionData.session?.user || sessionData.session.user.id !== user.id) {
+        router.push("/login");
+        return;
+      }
+
+      const userId = sessionData.session.user.id;
+      const saved = savedIds.includes(id);
+      const result = saved
+        ? await removeWishlistItem(userId, id)
+        : await addWishlistItem(userId, id);
+
+      if (result.error && result.error.code !== "23505") {
+        console.warn("Could not update wishlist:", result.error.message);
+        return;
+      }
+
+      setSavedIds((current) => saved ? current.filter((item) => item !== id) : Array.from(new Set([...current, id])));
+    } finally {
+      setWishlistLoadingIds((current) => {
+        const next = new Set(current);
+        next.delete(id);
+        return next;
+      });
+    }
   }
 
   return (
@@ -196,7 +259,7 @@ export default function MarketplacePage() {
           const isSaved = savedIds.includes(item.id);
           const imageUrl = isSafePublicImageUrl(item.images?.[0]) ? item.images[0] : null;
           return <article key={item.id} className="group flex flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xs transition-all hover:-translate-y-1 hover:shadow-md">
-            <div className="relative flex aspect-4/3 w-full items-center justify-center overflow-hidden bg-slate-100">{imageUrl ? <Image src={imageUrl} alt={item.title} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-cover transition duration-300 group-hover:scale-105" /> : <div className="text-5xl">{(item.category || "").toLowerCase().includes("calc") ? "🧮" : (item.category || "").toLowerCase().includes("book") ? "📚" : (item.category || "").toLowerCase().includes("lab") ? "🥼" : (item.category || "").toLowerCase().includes("draft") ? "📐" : (item.category || "").toLowerCase().includes("elect") ? "💻" : "📦"}</div>}<span className={`absolute left-3 top-3 rounded-full px-3 py-1 text-[11px] font-extrabold uppercase tracking-wider ${isGiveAway ? "bg-teal-500 text-white" : "bg-slate-900 text-white"}`}>{isGiveAway ? "Give Away" : "Swap"}</span><button type="button" onClick={() => toggleSaved(item.id)} aria-label="Save listing" className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-slate-600 shadow-xs transition hover:text-red-500"><Heart size={16} className={isSaved ? "fill-red-500 text-red-500" : ""} /></button></div>
+            <div className="relative flex aspect-4/3 w-full items-center justify-center overflow-hidden bg-slate-100">{imageUrl ? <Image src={imageUrl} alt={item.title} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-cover transition duration-300 group-hover:scale-105" /> : <div className="text-5xl">{(item.category || "").toLowerCase().includes("calc") ? "🧮" : (item.category || "").toLowerCase().includes("book") ? "📚" : (item.category || "").toLowerCase().includes("lab") ? "🥼" : (item.category || "").toLowerCase().includes("draft") ? "📐" : (item.category || "").toLowerCase().includes("elect") ? "💻" : "📦"}</div>}<span className={`absolute left-3 top-3 rounded-full px-3 py-1 text-[11px] font-extrabold uppercase tracking-wider ${isGiveAway ? "bg-teal-500 text-white" : "bg-slate-900 text-white"}`}>{isGiveAway ? "Give Away" : "Swap"}</span><WishlistButton saved={isSaved} loading={wishlistLoadingIds.has(item.id)} onToggle={() => void toggleSaved(item.id)} className="absolute right-3 top-3 h-8 w-8 bg-white/90 text-slate-600 shadow-xs hover:text-red-500" /></div>
             <div className="flex flex-1 flex-col p-5"><div className="flex items-start justify-between gap-2"><h3 className="line-clamp-1 text-base font-bold text-slate-900">{item.title}</h3>{item.condition && <span className="shrink-0 rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-600">{item.condition}</span>}</div>{!isGiveAway && item.swap_want && <div className="mt-2.5 rounded-xl border border-teal-100 bg-teal-50/80 p-2 text-xs"><span className="font-bold text-teal-800">What I Want: </span><span className="text-teal-900">{item.swap_want}</span></div>}<p className="mt-2 line-clamp-2 flex-1 text-xs leading-relaxed text-slate-500">{item.description || "No description provided."}</p><div className="mt-4 space-y-2 border-t border-slate-100 pt-3 text-xs text-slate-500"><div className="flex items-start gap-1.5"><GraduationCap size={14} className="mt-0.5 shrink-0 text-teal-600" /><span className="line-clamp-2"><strong className="text-slate-700">College:</strong> {college}</span></div><div className="text-slate-700">Listed by {item.owner_name}</div></div><Link href={`/marketplace/${item.id}`} className="mt-3 block w-full rounded-xl bg-slate-900 py-2.5 text-center text-xs font-bold text-white transition hover:bg-slate-800">View Details</Link></div>
           </article>;
         })}</div>}
