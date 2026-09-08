@@ -72,7 +72,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="font-sans antialiased text-slate-900 bg-white min-h-screen selection:bg-teal-100 selection:text-teal-900">
+      <body className="font-sans antialiased text-slate-900 bg-[#ede5d8] min-h-screen selection:bg-teal-100 selection:text-teal-900">
         <AuthProvider>{children}</AuthProvider>
       </body>
     </html>

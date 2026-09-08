@@ -60,18 +60,18 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-slate-100 bg-white/95 backdrop-blur-md">
+    <nav className="sticky top-3 z-50 mx-3 rounded-2xl border border-white/60 bg-white/95 shadow-sm backdrop-blur-2xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 py-3.5">
         {/* LOGO */}
         <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-500 text-white shadow-sm transition-transform group-hover:scale-105">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/70 bg-teal-100 text-teal-800 shadow-sm transition-transform group-hover:scale-105">
             <Recycle size={22} />
           </div>
           <div className="flex flex-col">
             <span className="text-xl font-bold tracking-tight text-slate-900 leading-none">
               UniSwap
             </span>
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-teal-600">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-teal-700">
               Campus Exchange
             </span>
           </div>
@@ -90,7 +90,7 @@ export default function Navbar() {
                 <Link
                   key={item.name}
                   href={item.href}
-                  className="ml-2 inline-flex items-center gap-2 rounded-xl bg-teal-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-600 active:scale-95"
+                  className="ml-2 inline-flex items-center gap-2 rounded-xl bg-teal-500/85 px-4 py-2.5 text-sm font-semibold text-slate-900 shadow-sm transition hover:bg-teal-600 active:scale-95"
                 >
                   <Icon size={16} />
                   <span>{item.name}</span>
@@ -220,7 +220,7 @@ export default function Navbar() {
                   key={item.name}
                   href={item.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-center gap-2 rounded-xl bg-teal-500 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-600"
+                  className="flex items-center justify-center gap-2 rounded-xl bg-teal-500/85 py-3 text-sm font-semibold text-slate-900 shadow-sm transition hover:bg-teal-600"
                 >
                   <Icon size={18} />
                   <span>{item.name}</span>
