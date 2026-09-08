@@ -1,13 +1,18 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import {
+  ArrowLeftRight,
   ArrowRight,
   BookOpen,
   Calculator,
-  Heart,
+  Gift,
   Laptop,
+  Loader2,
+  MapPin,
+  PackageOpen,
   Recycle,
   Shirt,
   Sparkles,
@@ -16,6 +21,8 @@ import {
 import Navbar from "@/components/Navbar";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/lib/supabase";
+import { isSafePublicImageUrl } from "@/lib/utils";
+import type { Listing } from "@/app/marketplace/page";
 
 const categories = [
   {
@@ -47,6 +54,42 @@ const categories = [
 export default function Home() {
   const { user } = useAuth();
   const [categoryCounts, setCategoryCounts] = useState<Record<string, number | null>>({});
+  const [featuredListing, setFeaturedListing] = useState<Listing | null>(null);
+  const [featuredLoading, setFeaturedLoading] = useState(true);
+  const [featuredError, setFeaturedError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadFeaturedListing() {
+      setFeaturedLoading(true);
+      setFeaturedError(null);
+
+      const { data, error } = await supabase
+        .from("listings")
+        .select("*")
+        .eq("status", "available")
+        .order("created_at", { ascending: false })
+        .limit(1);
+
+      if (cancelled) return;
+
+      if (error) {
+        setFeaturedListing(null);
+        setFeaturedError(error.message);
+      } else {
+        setFeaturedListing((data?.[0] as Listing | undefined) || null);
+      }
+
+      setFeaturedLoading(false);
+    }
+
+    void loadFeaturedListing();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -119,58 +162,85 @@ export default function Home() {
 
         {/* FEATURE CARD */}
         <div className="glass-elevated rounded-3xl p-5 shadow-sm">
-          <div className="glass-surface overflow-hidden rounded-2xl">
-            <div className="relative flex h-80 items-center justify-center bg-slate-100">
-              <span className="absolute left-5 top-5 rounded-full bg-teal-400 px-4 py-2 text-sm font-semibold text-white">
-                GIVE AWAY
-              </span>
-
-              <div className="flex h-48 w-48 items-center justify-center rounded-2xl border-4 border-amber-700 bg-amber-100 shadow-lg">
-                <Calculator size={110} strokeWidth={1.5} />
-              </div>
+          {featuredLoading ? (
+            <div className="glass-surface flex min-h-[28rem] flex-col items-center justify-center rounded-2xl p-8 text-center">
+              <Loader2 className="animate-spin text-teal-600" size={28} />
+              <p className="mt-3 text-sm text-slate-500">Loading available listings...</p>
             </div>
-
-            <div className="p-6">
-              <h2 className="text-2xl font-semibold">
-                Casio FX-991ES Plus
-              </h2>
-
-              <p className="mt-2 text-sm text-slate-500">
-                Like New • CSE • 3rd Year
+          ) : featuredError ? (
+            <div className="glass-surface flex min-h-[28rem] flex-col items-center justify-center rounded-2xl p-8 text-center">
+              <PackageOpen className="text-slate-400" size={34} />
+              <h2 className="mt-4 text-xl font-semibold">Listings are unavailable right now</h2>
+              <p className="mt-2 max-w-sm text-sm text-slate-500">{featuredError}</p>
+              <Link href="/marketplace" className="glass-control mt-6 rounded-xl px-5 py-3 text-sm font-semibold text-slate-700">
+                Browse Marketplace
+              </Link>
+            </div>
+          ) : !featuredListing ? (
+            <div className="glass-surface flex min-h-[28rem] flex-col items-center justify-center rounded-2xl p-8 text-center">
+              <PackageOpen className="text-slate-400" size={34} />
+              <h2 className="mt-4 text-xl font-semibold">No listings yet</h2>
+              <p className="mt-2 max-w-sm text-sm text-slate-500">
+                Be the first student to share something with your campus.
               </p>
-
-              <p className="mt-4 font-medium text-teal-600">
-                Free for a student who needs it
-              </p>
-
-              <div className="mt-6 flex justify-center gap-4">
-                <button
-                  type="button"
-                  className="flex h-12 w-12 items-center justify-center rounded-full border border-slate-200 text-slate-500"
-                >
-                  ×
-                </button>
-
-                <button
-                  type="button"
-                  className="flex h-12 w-12 items-center justify-center rounded-full bg-teal-400 text-white"
-                >
-                  <Heart size={20} fill="currentColor" />
-                </button>
-
-                <Link
-                  href="/marketplace"
-                  className="flex h-12 w-12 items-center justify-center rounded-full border border-slate-200 text-slate-700"
-                >
-                  <ArrowRight size={20} />
-                </Link>
+              <Link
+                href={user ? "/give" : "/login"}
+                className="glass-button mt-6 rounded-xl px-5 py-3 text-sm font-semibold"
+              >
+                Give an Item
+              </Link>
+            </div>
+          ) : (
+            <Link href={`/marketplace/${featuredListing.id}`} className="glass-surface group block overflow-hidden rounded-2xl">
+              <div className="relative flex h-80 items-center justify-center overflow-hidden bg-slate-100">
+                {isSafePublicImageUrl(featuredListing.images?.[0]) ? (
+                  <Image
+                    src={featuredListing.images[0]}
+                    alt={featuredListing.title}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 40vw"
+                    className="object-cover transition duration-300 group-hover:scale-105"
+                  />
+                ) : (
+                  <PackageOpen className="text-slate-400" size={72} strokeWidth={1.25} />
+                )}
+                {(featuredListing.exchange_type || featuredListing.type) && (
+                  <span className="absolute left-5 top-5 inline-flex items-center gap-1.5 rounded-full bg-teal-500 px-4 py-2 text-sm font-semibold text-slate-900">
+                    {(featuredListing.exchange_type || featuredListing.type || "").toLowerCase().includes("swap") ? <ArrowLeftRight size={15} /> : <Gift size={15} />}
+                    {featuredListing.exchange_type || featuredListing.type}
+                  </span>
+                )}
               </div>
 
-              <p className="mt-4 text-center text-xs text-slate-400">
-                Swipe through items • No payments
-              </p>
-            </div>
-          </div>
+              <div className="p-6">
+                <h2 className="line-clamp-2 text-2xl font-semibold">{featuredListing.title}</h2>
+
+                <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-sm text-slate-500">
+                  {featuredListing.condition && <span>{featuredListing.condition}</span>}
+                  {featuredListing.category && <span>{featuredListing.category}</span>}
+                </div>
+
+                {featuredListing.description && (
+                  <p className="mt-4 line-clamp-2 text-sm leading-6 text-slate-500">{featuredListing.description}</p>
+                )}
+
+                {(featuredListing.college_name || featuredListing.campus) && (
+                  <p className="mt-4 flex items-start gap-2 text-sm font-medium text-teal-700">
+                    <MapPin size={16} className="mt-0.5 shrink-0" />
+                    <span>{featuredListing.college_name || featuredListing.campus}</span>
+                  </p>
+                )}
+
+                <div className="mt-6 flex items-center justify-between gap-3">
+                  <span className="text-xs text-slate-400">Available listing</span>
+                  <span className="glass-button inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold">
+                    View listing
+                    <ArrowRight size={16} />
+                  </span>
+                </div>
+              </div>
+            </Link>
+          )}
         </div>
       </section>
 
