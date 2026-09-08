@@ -14,6 +14,7 @@ import {
   LogOut,
   LogIn,
   UserPlus,
+  List,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 
@@ -23,6 +24,15 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navLinks = [
+    ...(user
+      ? [
+          {
+            name: "My Listings",
+            href: "/my-listings",
+            icon: List,
+          },
+        ]
+      : []),
     {
       name: "Marketplace",
       href: "/marketplace",
