@@ -52,6 +52,9 @@ export const metadata: Metadata = {
     description:
       "Give away or swap college essentials with students on your campus — free, simple, and sustainable.",
   },
+  icons: {
+    icon: "/uniswap-logo.png",
+  },
   robots: {
     index: true,
     follow: true,

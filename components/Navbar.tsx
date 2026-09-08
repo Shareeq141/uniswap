@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
-  Recycle,
   ShoppingBag,
   Inbox,
   MessageSquare,
@@ -64,8 +64,15 @@ export default function Navbar() {
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 py-3.5">
         {/* LOGO */}
         <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="glass-bubble flex h-10 w-10 items-center justify-center rounded-xl text-teal-800 shadow-sm transition-transform group-hover:scale-105">
-            <Recycle size={22} />
+          <div className="glass-bubble flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl shadow-sm transition-transform group-hover:scale-105">
+            <Image
+              src="/uniswap-logo.png"
+              alt="UniSwap logo"
+              width={40}
+              height={38}
+              priority
+              className="h-9 w-9 object-contain"
+            />
           </div>
           <div className="flex flex-col">
             <span className="text-xl font-bold tracking-tight text-slate-900 leading-none">
