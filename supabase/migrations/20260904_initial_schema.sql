@@ -18,6 +18,12 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   updated_at TIMESTAMPTZ DEFAULT now()
 );
 
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS first_name TEXT;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS last_name TEXT;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS full_name TEXT;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS avatar_url TEXT;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS campus TEXT;
+
 -- Enable RLS on profiles
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
@@ -56,22 +62,31 @@ END $$;
 -- Automatic profile creation trigger on signup
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
+DECLARE
+  metadata JSONB := COALESCE(NEW.raw_user_meta_data, '{}'::jsonb);
+  first_name_value TEXT := COALESCE(metadata->>'first_name', '');
+  last_name_value TEXT := COALESCE(metadata->>'last_name', '');
+  full_name_value TEXT := COALESCE(
+    NULLIF(BTRIM(metadata->>'full_name'), ''),
+    NULLIF(BTRIM(CONCAT_WS(' ', NULLIF(BTRIM(first_name_value), ''), NULLIF(BTRIM(last_name_value), ''))), ''),
+    'Student'
+  );
 BEGIN
   INSERT INTO public.profiles (id, first_name, last_name, full_name, avatar_url)
   VALUES (
-    new.id,
-    COALESCE(new.raw_user_meta_data->>'first_name', ''),
-    COALESCE(new.raw_user_meta_data->>'last_name', ''),
-    COALESCE(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'first_name' || ' ' || new.raw_user_meta_data->>'last_name', 'Student'),
-    new.raw_user_meta_data->>'avatar_url'
+    NEW.id,
+    first_name_value,
+    last_name_value,
+    full_name_value,
+    metadata->>'avatar_url'
   )
   ON CONFLICT (id) DO UPDATE SET
     first_name = EXCLUDED.first_name,
     last_name = EXCLUDED.last_name,
     full_name = EXCLUDED.full_name;
-  RETURN new;
+  RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created

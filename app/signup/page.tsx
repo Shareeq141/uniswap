@@ -6,6 +6,29 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { AlertCircle, CheckCircle2, Loader2, ArrowRight } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
+function logSignupDatabaseError(error: unknown) {
+  if (!error || typeof error !== "object") {
+    console.error("Signup Supabase error:", String(error));
+    return;
+  }
+
+  const databaseError = error as {
+    message?: unknown;
+    code?: unknown;
+    details?: unknown;
+    hint?: unknown;
+    status?: unknown;
+  };
+
+  console.error("Signup Supabase error:", {
+    message: databaseError.message,
+    code: databaseError.code,
+    details: databaseError.details,
+    hint: databaseError.hint,
+    status: databaseError.status,
+  });
+}
+
 function SignupForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -74,22 +97,33 @@ function SignupForm() {
 
     const fullName = `${cleanFirstName} ${cleanLastName}`;
 
+    let signupResult;
+    try {
+      signupResult = await supabase.auth.signUp({
+        email: cleanEmail,
+        password,
+        options: {
+          data: {
+            first_name: cleanFirstName,
+            last_name: cleanLastName,
+            full_name: fullName,
+          },
+        },
+      });
+    } catch (signupException: unknown) {
+      logSignupDatabaseError(signupException);
+      setError("Supabase could not create the account. Check the auth/profile trigger configuration and try again.");
+      setLoading(false);
+      return;
+    }
+
     const {
       data: { user, session },
       error: signupError,
-    } = await supabase.auth.signUp({
-      email: cleanEmail,
-      password,
-      options: {
-        data: {
-          first_name: cleanFirstName,
-          last_name: cleanLastName,
-          full_name: fullName,
-        },
-      },
-    });
+    } = signupResult;
 
     if (signupError) {
+      logSignupDatabaseError(signupError);
       setError(formatSignupError(signupError.message));
       setLoading(false);
       return;
@@ -111,7 +145,7 @@ function SignupForm() {
 
     // Direct profile upsert as fallback for auto-trigger
     try {
-      await supabase.from("profiles").upsert(
+      const { error: profileError } = await supabase.from("profiles").upsert(
         {
           id: user.id,
           first_name: cleanFirstName,
@@ -122,8 +156,18 @@ function SignupForm() {
           onConflict: "id",
         }
       );
+
+      if (profileError) {
+        logSignupDatabaseError(profileError);
+        setError("Account created, but the profile could not be saved. Please contact support before retrying.");
+        setLoading(false);
+        return;
+      }
     } catch (profileErr) {
-      console.warn("Profile direct upsert notice:", profileErr);
+      logSignupDatabaseError(profileErr);
+      setError("Account created, but the profile could not be saved. Please contact support before retrying.");
+      setLoading(false);
+      return;
     }
 
     setSuccess("Account created successfully! Redirecting...");

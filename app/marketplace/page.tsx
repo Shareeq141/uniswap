@@ -55,6 +55,14 @@ function safeSearchTerm(value: string) {
   return value.normalize("NFKC").replace(/[^\p{L}\p{N}\s-]/gu, " ").replace(/\s+/g, " ").trim();
 }
 
+function normalizeCoordinate(value: unknown, minimum: number, maximum: number): number | null {
+  if (value === null || value === undefined || value === "") return null;
+  const numericValue = typeof value === "number" ? value : Number(value);
+  return Number.isFinite(numericValue) && numericValue >= minimum && numericValue <= maximum
+    ? numericValue
+    : null;
+}
+
 export default function MarketplacePage() {
   const [listings, setListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
@@ -91,7 +99,10 @@ export default function MarketplacePage() {
         }
       }
 
-      if (!data) {
+      // An empty RPC response is still a valid response, but querying the
+      // published listings lets the client distinguish a genuinely empty
+      // radius from a stale/unapplied nearby RPC without inventing data.
+      if (!data || (location && !term && data.length === 0)) {
         let query = supabase.from("listings").select("*").eq("status", "available").order("created_at", { ascending: false });
         if (term) {
           const pattern = `%${term}%`;
@@ -104,7 +115,11 @@ export default function MarketplacePage() {
 
       if (listingsError) throw listingsError;
 
-      const rows = data || [];
+      const rows = (data || []).map((item) => ({
+        ...item,
+        latitude: normalizeCoordinate(item.latitude, -90, 90),
+        longitude: normalizeCoordinate(item.longitude, -180, 180),
+      }));
       const ownerIds = Array.from(new Set(rows.map((item) => item.owner_id).filter(Boolean))) as string[];
       let profileMap: Record<string, string> = {};
       if (ownerIds.length > 0) {
@@ -175,7 +190,7 @@ export default function MarketplacePage() {
         <div className="mb-4 flex items-center justify-between"><h2 className="text-lg font-bold text-slate-900">Available Items ({filteredListings.length})</h2>{userLocation && <span className="inline-flex items-center gap-1 text-xs font-medium text-teal-700"><Navigation size={13} /> Within 1.5 km</span>}</div>
         {error && <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 p-5 text-sm text-red-700"><p className="font-semibold">Could not load items</p><p className="mt-1">{error}</p><button type="button" onClick={() => void loadListings(search, userLocation)} className="mt-3 rounded-xl bg-red-600 px-4 py-2 text-xs font-bold text-white hover:bg-red-700">Retry</button></div>}
 
-        {loading ? <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">{[1, 2, 3, 4, 5, 6].map((number) => <div key={number} className="h-80 animate-pulse rounded-3xl border border-slate-100 bg-white p-4"><div className="mb-4 h-40 rounded-2xl bg-slate-100" /><div className="mb-2 h-4 w-3/4 rounded-lg bg-slate-100" /><div className="mb-4 h-3 w-1/2 rounded-lg bg-slate-100" /><div className="h-8 w-full rounded-xl bg-slate-100" /></div>)}</div> : filteredListings.length === 0 ? <div className="rounded-3xl border border-slate-200 bg-white p-12 text-center shadow-xs"><div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-teal-50 text-teal-600"><PackageOpen size={32} /></div><h3 className="text-xl font-bold text-slate-900">No Listings Found</h3><p className="mx-auto mt-2 max-w-md text-sm text-slate-500">Try a different item or college search, clear the filters, or publish the first listing.</p><button type="button" onClick={() => { setSearch(""); setSelectedCategory("All"); setSelectedCondition("All"); setExchangeFilter("All"); }} className="mt-6 rounded-xl border border-slate-200 px-5 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50">Reset Filters</button></div> : <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">{filteredListings.map((item) => {
+        {loading ? <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">{[1, 2, 3, 4, 5, 6].map((number) => <div key={number} className="h-80 animate-pulse rounded-3xl border border-slate-100 bg-white p-4"><div className="mb-4 h-40 rounded-2xl bg-slate-100" /><div className="mb-2 h-4 w-3/4 rounded-lg bg-slate-100" /><div className="mb-4 h-3 w-1/2 rounded-lg bg-slate-100" /><div className="h-8 w-full rounded-xl bg-slate-100" /></div>)}</div> : filteredListings.length === 0 ? <div className="rounded-3xl border border-slate-200 bg-white p-12 text-center shadow-xs"><div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-teal-50 text-teal-600"><PackageOpen size={32} /></div><h3 className="text-xl font-bold text-slate-900">{userLocation ? "No Nearby Listings Found" : "No Listings Found"}</h3><p className="mx-auto mt-2 max-w-md text-sm text-slate-500">{userLocation ? "No available listing with saved coordinates is within 1.5 km of your current browser location. Listings without latitude/longitude are excluded from nearby results. Turn off Live Location to browse all available listings." : "Try a different item or college search, clear the filters, or publish the first listing."}</p><button type="button" onClick={() => { setSearch(""); setSelectedCategory("All"); setSelectedCondition("All"); setExchangeFilter("All"); }} className="mt-6 rounded-xl border border-slate-200 px-5 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50">Reset Filters</button></div> : <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">{filteredListings.map((item) => {
           const isGiveAway = (item.exchange_type || item.type || "").toLowerCase().includes("give");
           const college = item.college_name || item.campus || "College not provided";
           const isSaved = savedIds.includes(item.id);
