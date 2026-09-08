@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import {
   ArrowRight,
   BookOpen,
@@ -14,42 +15,66 @@ import {
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { useAuth } from "@/lib/auth-context";
+import { supabase } from "@/lib/supabase";
 
 const categories = [
   {
     name: "Calculators",
     icon: Calculator,
-    count: "124 items",
   },
   {
     name: "Textbooks",
     icon: BookOpen,
-    count: "86 items",
   },
   {
     name: "Electronics",
     icon: Laptop,
-    count: "72 items",
   },
   {
     name: "Clothing",
     icon: Shirt,
-    count: "54 items",
   },
   {
     name: "Tools",
     icon: Wrench,
-    count: "41 items",
   },
   {
     name: "Other",
     icon: Recycle,
-    count: "96 items",
   },
 ];
 
 export default function Home() {
   const { user } = useAuth();
+  const [categoryCounts, setCategoryCounts] = useState<Record<string, number | null>>({});
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadCategoryCounts() {
+      const results = await Promise.all(
+        categories.map(async (category) => {
+          const { count, error } = await supabase
+            .from("listings")
+            .select("id", { count: "exact", head: true })
+            .eq("status", "available")
+            .eq("category", category.name);
+
+          return [category.name, error ? null : count ?? 0] as const;
+        }),
+      );
+
+      if (!cancelled) {
+        setCategoryCounts(Object.fromEntries(results));
+      }
+    }
+
+    void loadCategoryCounts();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
     <main className="min-h-screen bg-white text-slate-900">
@@ -90,25 +115,6 @@ export default function Home() {
             </Link>
           </div>
 
-          {/* Stats */}
-          <div className="mt-14 flex gap-12">
-            <div>
-              <div className="text-3xl font-semibold">1,200+</div>
-              <div className="mt-1 text-sm text-slate-500">Items shared</div>
-            </div>
-
-            <div>
-              <div className="text-3xl font-semibold">850+</div>
-              <div className="mt-1 text-sm text-slate-500">
-                Student exchanges
-              </div>
-            </div>
-
-            <div>
-              <div className="text-3xl font-semibold">25+</div>
-              <div className="mt-1 text-sm text-slate-500">Campuses</div>
-            </div>
-          </div>
         </div>
 
         {/* FEATURE CARD */}
@@ -218,9 +224,11 @@ export default function Home() {
                     {category.name}
                   </h3>
 
-                  <p className="mt-1 text-sm text-slate-400">
-                    {category.count}
-                  </p>
+                  {typeof categoryCounts[category.name] === "number" && (
+                    <p className="mt-1 text-sm text-slate-400">
+                      {categoryCounts[category.name]} {categoryCounts[category.name] === 1 ? "item" : "items"}
+                    </p>
+                  )}
                 </Link>
               );
             })}
