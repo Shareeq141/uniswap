@@ -289,10 +289,10 @@ export default function ConversationDetailPage() {
 
   if (!user && !loading) {
     return (
-      <div className="min-h-screen bg-[#fafcfb] flex flex-col">
+      <div className="min-h-screen bg-[#f7f7f3] flex flex-col">
         <Navbar />
         <div className="flex-1 flex items-center justify-center px-4 py-12">
-          <div className="max-w-md w-full rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-sm">
+          <div className="glass-panel max-w-md w-full rounded-3xl p-8 text-center shadow-sm">
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-teal-50 text-teal-600 mb-4">
               <MessageSquare size={32} />
             </div>
@@ -315,12 +315,12 @@ export default function ConversationDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#fbfcfa] flex flex-col">
+    <div className="min-h-screen bg-[#f7f7f3] flex flex-col">
       <Navbar />
 
       <main className="flex-1 mx-auto w-full max-w-3xl flex flex-col px-4 sm:px-6 py-4 sm:py-6">
         {/* CHAT CONTAINER */}
-        <div className="flex-1 flex flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+        <div className="glass-panel flex-1 flex flex-col overflow-hidden rounded-3xl shadow-sm">
           {/* CHAT HEADER */}
           <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4 bg-white">
             <div className="flex items-center gap-3">

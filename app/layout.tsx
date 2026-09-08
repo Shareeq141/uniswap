@@ -6,7 +6,7 @@ import "./globals.css";
 const siteUrl = env.NEXT_PUBLIC_SITE_URL || "https://uniswap-campus.vercel.app";
 
 export const viewport: Viewport = {
-  themeColor: "#0d9488",
+  themeColor: "#8faf8a",
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
@@ -72,7 +72,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="font-sans antialiased text-slate-900 bg-[#ede5d8] min-h-screen selection:bg-teal-100 selection:text-teal-900">
+      <body className="font-sans antialiased text-slate-900 bg-[#f7f7f3] min-h-screen selection:bg-teal-100 selection:text-teal-900">
         <AuthProvider>{children}</AuthProvider>
       </body>
     </html>

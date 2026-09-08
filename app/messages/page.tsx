@@ -210,7 +210,7 @@ export default function MessagesIndexPage() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-[#fafcfb] flex flex-col">
+      <div className="min-h-screen bg-[#f7f7f3] flex flex-col">
         <Navbar />
         <div className="flex-1 flex items-center justify-center">
           <Loader2 className="animate-spin text-teal-600" size={24} />
@@ -221,10 +221,10 @@ export default function MessagesIndexPage() {
 
   if (!user && !authLoading) {
     return (
-      <div className="min-h-screen bg-[#fafcfb] flex flex-col">
+      <div className="min-h-screen bg-[#f7f7f3] flex flex-col">
         <Navbar />
         <div className="flex-1 flex items-center justify-center px-4 py-12">
-          <div className="max-w-md w-full rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-sm">
+          <div className="glass-panel max-w-md w-full rounded-3xl p-8 text-center shadow-sm">
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-teal-50 text-teal-600 mb-4">
               <MessageSquare size={32} />
             </div>
@@ -247,7 +247,7 @@ export default function MessagesIndexPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#fbfcfa] flex flex-col">
+    <div className="min-h-screen bg-[#f7f7f3] flex flex-col">
       <Navbar />
 
       <main className="flex-1 mx-auto w-full max-w-3xl px-4 sm:px-6 py-8 sm:py-10">
@@ -273,7 +273,7 @@ export default function MessagesIndexPage() {
             <p className="text-xs text-slate-500">Loading your conversations...</p>
           </div>
         ) : conversations.length === 0 ? (
-          <div className="rounded-3xl border border-slate-200 bg-white p-12 text-center shadow-xs">
+          <div className="glass-panel rounded-3xl p-12 text-center shadow-xs">
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-teal-50 text-teal-600 mb-4">
               <Inbox size={30} />
             </div>
@@ -303,7 +303,7 @@ export default function MessagesIndexPage() {
                 key={conv.id}
                 type="button"
                 onClick={() => router.push(`/messages/${conv.id}`)}
-                className="w-full rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 text-left transition hover:border-teal-300 hover:bg-teal-50/30 flex items-center justify-between gap-4 shadow-2xs group"
+                className="glass-elevated w-full rounded-2xl p-4 sm:p-5 text-left transition flex items-center justify-between gap-4 shadow-2xs group"
               >
                 <div className="flex items-center gap-3.5 min-w-0">
                   {/* AVATAR */}

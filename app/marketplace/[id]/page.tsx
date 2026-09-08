@@ -306,7 +306,7 @@ export default function ListingDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#fafcfb] flex flex-col">
+      <div className="min-h-screen bg-[#f7f7f3] flex flex-col">
         <Navbar />
         <div className="flex-1 flex items-center justify-center">
           <div className="flex items-center gap-2.5 text-slate-500 font-medium text-sm">
@@ -320,10 +320,10 @@ export default function ListingDetailPage() {
 
   if (error || !item) {
     return (
-      <div className="min-h-screen bg-[#fafcfb] flex flex-col">
+      <div className="min-h-screen bg-[#f7f7f3] flex flex-col">
         <Navbar />
         <div className="flex-1 flex items-center justify-center px-4 py-12">
-          <div className="max-w-md w-full rounded-3xl border border-red-200 bg-white p-8 text-center shadow-sm">
+          <div className="glass-panel max-w-md w-full rounded-3xl border-red-200 p-8 text-center shadow-sm">
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-red-50 text-red-600 mb-4">
               <AlertCircle size={32} />
             </div>
@@ -351,7 +351,7 @@ export default function ListingDetailPage() {
   const isOwner = user?.id === item.owner_id;
 
   return (
-    <div className="min-h-screen bg-[#fbfcfa] flex flex-col">
+    <div className="min-h-screen bg-[#f7f7f3] flex flex-col">
       <Navbar />
 
       <main className="flex-1 mx-auto w-full max-w-5xl px-4 sm:px-6 py-6 sm:py-10">
@@ -365,7 +365,7 @@ export default function ListingDetailPage() {
         </Link>
 
         {/* MAIN CARD */}
-        <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm grid md:grid-cols-2 gap-0">
+        <div className="glass-panel overflow-hidden rounded-3xl shadow-sm grid md:grid-cols-2 gap-0">
           {/* LEFT: IMAGE GALLERY */}
           <div className="flex flex-col border-b md:border-b-0 md:border-r border-slate-100 bg-slate-50 p-6">
             <div className="relative aspect-4/3 w-full overflow-hidden rounded-2xl bg-slate-100 flex items-center justify-center border border-slate-200">
@@ -629,7 +629,7 @@ export default function ListingDetailPage() {
       {/* SWAP OFFER PROMPT MODAL */}
       {swapOfferModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 animate-in fade-in">
-          <div className="w-full max-w-md rounded-3xl bg-white p-6 sm:p-8 shadow-2xl space-y-5">
+          <div className="glass-panel w-full max-w-md rounded-3xl p-6 sm:p-8 shadow-2xl space-y-5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-teal-700 font-bold text-base">
                 <ArrowLeftRight size={20} />

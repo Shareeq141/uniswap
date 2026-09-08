@@ -314,15 +314,15 @@ export default function MyListingsPage() {
   }
 
   if (authLoading || loading) {
-    return <div className="min-h-screen bg-[#fbfcfa] flex flex-col"><Navbar /><div className="flex-1 flex items-center justify-center"><Loader2 className="animate-spin text-teal-600" size={24} /></div></div>;
+    return <div className="min-h-screen bg-[#f7f7f3] flex flex-col"><Navbar /><div className="flex-1 flex items-center justify-center"><Loader2 className="animate-spin text-teal-600" size={24} /></div></div>;
   }
 
   if (!user) {
-    return <div className="min-h-screen bg-[#fbfcfa] flex flex-col"><Navbar /><main className="flex-1 flex items-center justify-center p-6"><div className="rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-sm"><h1 className="text-2xl font-bold text-slate-900">Log in to view My Listings</h1><Link href="/login?redirect=/my-listings" className="mt-5 inline-flex rounded-xl bg-teal-500 px-5 py-3 text-sm font-semibold text-white">Log in</Link></div></main></div>;
+    return <div className="min-h-screen bg-[#f7f7f3] flex flex-col"><Navbar /><main className="flex-1 flex items-center justify-center p-6"><div className="glass-panel rounded-3xl p-8 text-center shadow-sm"><h1 className="text-2xl font-bold text-slate-900">Log in to view My Listings</h1><Link href="/login?redirect=/my-listings" className="glass-button mt-5 inline-flex rounded-xl px-5 py-3 text-sm font-semibold">Log in</Link></div></main></div>;
   }
 
   return (
-    <div className="min-h-screen bg-[#fbfcfa] flex flex-col">
+    <div className="min-h-screen bg-[#f7f7f3] flex flex-col">
       <Navbar />
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6">
         <div className="mb-8 flex items-end justify-between gap-4">
@@ -333,7 +333,7 @@ export default function MyListingsPage() {
         {error && <div className="mb-6 flex items-start gap-2 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"><AlertCircle size={17} className="mt-0.5 shrink-0" /><span>{error}</span></div>}
 
         {listings.length === 0 ? (
-          <div className="rounded-3xl border border-slate-200 bg-white p-12 text-center shadow-xs"><PackageOpen className="mx-auto text-teal-600" size={38} /><h2 className="mt-4 text-xl font-bold text-slate-900">No listings yet</h2><p className="mt-1 text-sm text-slate-500">Items you publish will appear here.</p></div>
+          <div className="glass-panel rounded-3xl p-12 text-center shadow-xs"><PackageOpen className="mx-auto text-teal-600" size={38} /><h2 className="mt-4 text-xl font-bold text-slate-900">No listings yet</h2><p className="mt-1 text-sm text-slate-500">Items you publish will appear here.</p></div>
         ) : (
           <div className="grid gap-5 lg:grid-cols-2">
             {listings.map((listing) => {
@@ -341,7 +341,7 @@ export default function MyListingsPage() {
               const images = (listing.images || []).filter(isSafePublicImageUrl);
               const isEditing = editingId === listing.id && draft;
               return (
-                <article key={listing.id} className="rounded-3xl border border-slate-200 bg-white p-5 shadow-xs">
+                <article key={listing.id} className="glass-elevated rounded-3xl p-5 shadow-xs">
                   <div className="flex gap-4">
                     <div className="relative h-28 w-28 shrink-0 overflow-hidden rounded-2xl bg-slate-100">{images[0] ? <Image src={images[0]} alt={listing.title} fill sizes="112px" className="object-cover" /> : <div className="flex h-full items-center justify-center text-4xl">📦</div>}</div>
                     <div className="min-w-0 flex-1"><div className="flex items-start justify-between gap-2"><h2 className="truncate text-lg font-bold text-slate-900">{listing.title}</h2><span className="shrink-0 rounded-full bg-teal-50 px-2.5 py-1 text-[11px] font-bold capitalize text-teal-700">{listing.status}</span></div><p className="mt-1 text-xs text-slate-500">{isSwap ? <><ArrowLeftRight className="mr-1 inline" size={13} />Swap</> : <><Gift className="mr-1 inline" size={13} />Give Away</>} · {listing.college_name || listing.campus || "College not provided"}</p><p className="mt-2 line-clamp-2 text-sm text-slate-600">{listing.description}</p></div>

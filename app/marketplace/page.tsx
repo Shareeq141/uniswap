@@ -225,29 +225,29 @@ export default function MarketplacePage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#fbfcfa] flex flex-col">
+    <div className="min-h-screen bg-[#f7f7f3] flex flex-col">
       <Navbar />
       <main className="flex-1 mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 sm:py-8">
-        <div className="mb-6 rounded-3xl border border-teal-100 bg-gradient-to-r from-teal-500/10 via-emerald-500/5 to-teal-50 p-6 sm:p-8">
+        <div className="glass-panel mb-6 p-6 sm:p-8">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div className="max-w-2xl">
-              <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-xs font-semibold text-teal-700 shadow-xs"><Sparkles size={14} /> Campus Student Marketplace</div>
+              <div className="glass-pill mb-3 inline-flex items-center gap-2 px-3 py-1 text-xs font-semibold text-teal-700 shadow-xs"><Sparkles size={14} /> Campus Student Marketplace</div>
               <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl lg:text-4xl">Find what you need. <span className="text-teal-600">Give what you don&apos;t.</span></h1>
               <p className="mt-2 text-sm leading-relaxed text-slate-600">Search by item, description, or college. Nearby matching uses one-time browser location only.</p>
             </div>
-            <Link href="/give" className="inline-flex self-start items-center gap-2 rounded-2xl bg-teal-500 px-5 py-3.5 text-sm font-bold text-white shadow-sm transition hover:bg-teal-600"><Gift size={18} /> List an Item</Link>
+            <Link href="/give" className="glass-button inline-flex self-start items-center gap-2 rounded-2xl px-5 py-3.5 text-sm font-bold shadow-sm"><Gift size={18} /> List an Item</Link>
           </div>
           <div className="mt-5 max-w-md"><LiveLocationControl value={userLocation} onChange={setUserLocation} compact /></div>
         </div>
 
         <div className="mb-6 flex flex-col gap-3 sm:flex-row">
-          <div className="relative flex-1"><Search size={19} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" /><input type="text" aria-label="Search campus items" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search items, descriptions, or college names..." className="w-full rounded-2xl border border-slate-200 bg-white py-3.5 pl-11 pr-4 text-sm outline-none shadow-2xs transition focus:border-teal-500 focus:ring-2 focus:ring-teal-100" /></div>
-          <div className="inline-flex rounded-2xl border border-slate-200 bg-white p-1 shadow-2xs">
+          <div className="glass-control relative flex-1"><Search size={19} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" /><input type="text" aria-label="Search campus items" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search items, descriptions, or college names..." className="w-full rounded-2xl border-0 bg-transparent py-3.5 pl-11 pr-4 text-sm outline-none shadow-none transition focus:ring-0" /></div>
+          <div className="glass-surface inline-flex rounded-2xl p-1 shadow-2xs">
             {(["All", "Give Away", "Swap"] as const).map((type) => <button key={type} type="button" onClick={() => setExchangeFilter(type)} className={`rounded-xl px-4 py-2 text-xs font-bold transition ${exchangeFilter === type ? "bg-teal-500 text-white shadow-xs" : "text-slate-600 hover:text-slate-900"}`}>{type === "Give Away" && <Gift size={13} className="mr-1 inline" />}{type === "Swap" && <ArrowLeftRight size={13} className="mr-1 inline" />}{type}</button>)}
           </div>
         </div>
 
-        <div className="mb-6 overflow-x-auto pb-1"><div className="flex min-w-max gap-2">{categories.map((category) => <button key={category} type="button" onClick={() => setSelectedCategory(category)} className={`rounded-full px-4 py-1.5 text-xs font-semibold transition ${selectedCategory === category ? "bg-teal-500 text-white shadow-xs" : "border border-slate-200 bg-white text-slate-600 hover:border-slate-300"}`}>{category}</button>)}</div></div>
+        <div className="mb-6 overflow-x-auto pb-1"><div className="flex min-w-max gap-2">{categories.map((category) => <button key={category} type="button" onClick={() => setSelectedCategory(category)} className={`glass-pill px-4 py-1.5 text-xs font-semibold transition ${selectedCategory === category ? "bg-teal-500 text-slate-900 shadow-xs" : "text-slate-600 hover:bg-white/40"}`}>{category}</button>)}</div></div>
         <div className="mb-8 flex items-center gap-2 overflow-x-auto pb-1"><span className="mr-1 text-xs font-bold uppercase tracking-wider text-slate-400">Condition:</span>{conditions.map((condition) => <button key={condition} type="button" onClick={() => setSelectedCondition(condition)} className={`rounded-lg px-3 py-1 text-xs font-medium transition ${selectedCondition === condition ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}>{condition}</button>)}</div>
 
         <div className="mb-4 flex items-center justify-between"><h2 className="text-lg font-bold text-slate-900">Available Items ({filteredListings.length})</h2>{userLocation && <span className="inline-flex items-center gap-1 text-xs font-medium text-teal-700"><Navigation size={13} /> Within 1.5 km</span>}</div>
@@ -258,7 +258,7 @@ export default function MarketplacePage() {
           const college = item.college_name || item.campus || "College not provided";
           const isSaved = savedIds.includes(item.id);
           const imageUrl = isSafePublicImageUrl(item.images?.[0]) ? item.images[0] : null;
-          return <article key={item.id} className="group flex flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xs transition-all hover:-translate-y-1 hover:shadow-md">
+          return <article key={item.id} className="glass-elevated group flex flex-col overflow-hidden rounded-3xl shadow-2xs">
             <div className="relative flex aspect-4/3 w-full items-center justify-center overflow-hidden bg-slate-100">{imageUrl ? <Image src={imageUrl} alt={item.title} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-cover transition duration-300 group-hover:scale-105" /> : <div className="text-5xl">{(item.category || "").toLowerCase().includes("calc") ? "🧮" : (item.category || "").toLowerCase().includes("book") ? "📚" : (item.category || "").toLowerCase().includes("lab") ? "🥼" : (item.category || "").toLowerCase().includes("draft") ? "📐" : (item.category || "").toLowerCase().includes("elect") ? "💻" : "📦"}</div>}<span className={`absolute left-3 top-3 rounded-full px-3 py-1 text-[11px] font-extrabold uppercase tracking-wider ${isGiveAway ? "bg-teal-500 text-white" : "bg-slate-900 text-white"}`}>{isGiveAway ? "Give Away" : "Swap"}</span><WishlistButton saved={isSaved} loading={wishlistLoadingIds.has(item.id)} onToggle={() => void toggleSaved(item.id)} className="absolute right-3 top-3 h-8 w-8 bg-white/90 text-slate-600 shadow-xs hover:text-red-500" /></div>
             <div className="flex flex-1 flex-col p-5"><div className="flex items-start justify-between gap-2"><h3 className="line-clamp-1 text-base font-bold text-slate-900">{item.title}</h3>{item.condition && <span className="shrink-0 rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-600">{item.condition}</span>}</div>{!isGiveAway && item.swap_want && <div className="mt-2.5 rounded-xl border border-teal-100 bg-teal-50/80 p-2 text-xs"><span className="font-bold text-teal-800">What I Want: </span><span className="text-teal-900">{item.swap_want}</span></div>}<p className="mt-2 line-clamp-2 flex-1 text-xs leading-relaxed text-slate-500">{item.description || "No description provided."}</p><div className="mt-4 space-y-2 border-t border-slate-100 pt-3 text-xs text-slate-500"><div className="flex items-start gap-1.5"><GraduationCap size={14} className="mt-0.5 shrink-0 text-teal-600" /><span className="line-clamp-2"><strong className="text-slate-700">College:</strong> {college}</span></div><div className="text-slate-700">Listed by {item.owner_name}</div></div><Link href={`/marketplace/${item.id}`} className="mt-3 block w-full rounded-xl bg-slate-900 py-2.5 text-center text-xs font-bold text-white transition hover:bg-slate-800">View Details</Link></div>
           </article>;

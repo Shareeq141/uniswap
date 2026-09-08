@@ -227,10 +227,10 @@ export default function ProfilePage() {
 
   if (authLoading || (!user && !authLoading)) {
     return (
-      <div className="min-h-screen bg-[#fbfcfa]">
+      <div className="min-h-screen bg-[#f7f7f3]">
         <Navbar />
         <main className="mx-auto flex min-h-[60vh] max-w-3xl items-center justify-center px-4 py-12">
-          <div className="rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-sm">
+          <div className="glass-panel rounded-3xl p-8 text-center shadow-sm">
             {authLoading ? (
               <Loader2 className="mx-auto animate-spin text-teal-600" size={24} />
             ) : (
@@ -251,7 +251,7 @@ export default function ProfilePage() {
   if (!authenticatedUser) return null;
 
   return (
-    <div className="min-h-screen bg-[#fbfcfa]">
+    <div className="min-h-screen bg-[#f7f7f3]">
       <Navbar />
       <main className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 sm:py-10">
         <Link href="/marketplace" className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-teal-600">
@@ -259,7 +259,7 @@ export default function ProfilePage() {
           Back to Marketplace
         </Link>
 
-        <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+        <section className="glass-panel rounded-3xl p-6 shadow-sm sm:p-8">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-4 sm:gap-6">
               <ProfileAvatar profile={profile} user={user} size="lg" />
@@ -281,7 +281,7 @@ export default function ProfilePage() {
           {error && <p className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">{error}</p>}
 
           {editing && (
-            <form onSubmit={saveProfile} className="mt-6 grid gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:grid-cols-2">
+            <form onSubmit={saveProfile} className="glass-surface mt-6 grid gap-4 rounded-2xl p-4 sm:grid-cols-2">
               <div>
                 <label htmlFor="profile-name" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-500">Name</label>
                 <input id="profile-name" value={nameDraft} onChange={(event) => setNameDraft(event.target.value)} maxLength={160} className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-100" />
@@ -303,17 +303,17 @@ export default function ProfilePage() {
         </section>
 
         <section className="mt-6 grid gap-4 sm:grid-cols-3">
-          <Link href="/my-listings" className="rounded-2xl border border-slate-200 bg-white p-5 shadow-2xs transition hover:-translate-y-0.5 hover:shadow-sm">
+          <Link href="/my-listings" className="glass-elevated rounded-2xl p-5 shadow-2xs">
             <p className="text-xs font-bold uppercase tracking-wider text-slate-400">My Listings</p>
             <p className="mt-2 text-3xl font-extrabold text-slate-900">{loading || stats.listings === null ? "—" : stats.listings}</p>
             <p className="mt-1 text-xs font-medium text-teal-700">View your listings</p>
           </Link>
-          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-2xs">
+          <div className="glass-elevated rounded-2xl p-5 shadow-2xs">
             <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Items Exchanged</p>
             <p className="mt-2 text-3xl font-extrabold text-slate-900">{loading || stats.exchanged === null ? "—" : stats.exchanged}</p>
             <p className="mt-1 text-xs font-medium text-slate-500">Accepted requests</p>
           </div>
-          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-2xs">
+          <div className="glass-elevated rounded-2xl p-5 shadow-2xs">
             <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Wishlist</p>
             <p className="mt-2 text-3xl font-extrabold text-slate-900">{wishlistLoading ? "—" : wishlistEntries.length}</p>
             <p className="mt-1 text-xs font-medium text-slate-500">Saved listings</p>
@@ -331,9 +331,9 @@ export default function ProfilePage() {
 
           {wishlistError && <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">{wishlistError}</div>}
           {wishlistLoading ? (
-            <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-500">Loading wishlist...</div>
+            <div className="glass-surface rounded-2xl p-8 text-center text-sm text-slate-500">Loading wishlist...</div>
           ) : wishlistEntries.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center">
+            <div className="glass-surface rounded-2xl border-dashed p-10 text-center">
               <Heart className="mx-auto text-slate-300" size={30} />
               <h3 className="mt-3 font-bold text-slate-900">No saved listings yet</h3>
               <p className="mt-1 text-sm text-slate-500">Tap the heart on a marketplace listing to save it here.</p>
@@ -344,7 +344,7 @@ export default function ProfilePage() {
                 const imageUrl = isSafePublicImageUrl(entry.listing.images?.[0]) ? entry.listing.images[0] : null;
                 const isAvailable = entry.listing.status === "available";
                 const card = (
-                  <article className="group flex overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xs transition hover:shadow-sm">
+                  <article className="glass-elevated group flex overflow-hidden rounded-2xl shadow-2xs">
                     <div className="relative flex h-32 w-32 shrink-0 items-center justify-center overflow-hidden bg-slate-100">
                       {imageUrl ? <Image src={imageUrl} alt={entry.listing.title} fill sizes="128px" className="object-cover" /> : <PackageOpen className="text-slate-300" size={30} />}
                     </div>

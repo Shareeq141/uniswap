@@ -60,11 +60,11 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className="sticky top-3 z-50 mx-3 rounded-2xl border border-white/60 bg-white/95 shadow-sm backdrop-blur-2xl">
+    <nav className="glass-panel sticky top-3 z-50 mx-3 rounded-2xl shadow-sm">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 py-3.5">
         {/* LOGO */}
         <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/70 bg-teal-100 text-teal-800 shadow-sm transition-transform group-hover:scale-105">
+          <div className="glass-bubble flex h-10 w-10 items-center justify-center rounded-xl text-teal-800 shadow-sm transition-transform group-hover:scale-105">
             <Recycle size={22} />
           </div>
           <div className="flex flex-col">
@@ -90,7 +90,7 @@ export default function Navbar() {
                 <Link
                   key={item.name}
                   href={item.href}
-                  className="ml-2 inline-flex items-center gap-2 rounded-xl bg-teal-500/85 px-4 py-2.5 text-sm font-semibold text-slate-900 shadow-sm transition hover:bg-teal-600 active:scale-95"
+                  className="glass-button ml-2 inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold shadow-sm active:scale-95"
                 >
                   <Icon size={16} />
                   <span>{item.name}</span>
@@ -104,8 +104,8 @@ export default function Navbar() {
                 href={item.href}
                 className={`relative inline-flex items-center gap-2 rounded-xl px-3.5 py-2 text-sm font-medium transition ${
                   isActive
-                    ? "bg-teal-50 text-teal-700 font-semibold"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                    ? "bg-teal-100/70 text-teal-700 font-semibold"
+                    : "text-slate-600 hover:bg-white/40 hover:text-slate-900"
                 }`}
               >
                 <Icon size={17} className={isActive ? "text-teal-600" : "text-slate-400"} />
@@ -142,7 +142,7 @@ export default function Navbar() {
               <button
                 type="button"
                 onClick={() => signOut()}
-                className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition"
+                className="glass-control inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-700 transition"
               >
                 <LogOut size={14} />
                 <span>Log out</span>
@@ -159,7 +159,7 @@ export default function Navbar() {
               </Link>
               <Link
                 href="/signup"
-                className="inline-flex items-center gap-1.5 rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 transition"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-slate-900/90 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800"
               >
                 <UserPlus size={15} />
                 <span>Join</span>
@@ -197,7 +197,7 @@ export default function Navbar() {
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 transition"
+            className="glass-control flex h-10 w-10 items-center justify-center rounded-xl text-slate-700 transition"
             aria-label="Toggle navigation menu"
           >
             {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -207,7 +207,7 @@ export default function Navbar() {
 
       {/* MOBILE DROPDOWN MENU */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-slate-100 bg-white px-4 py-4 space-y-2 shadow-lg animate-in slide-in-from-top-2">
+        <div className="glass-surface md:hidden border-t border-slate-100 px-4 py-4 space-y-2 shadow-lg animate-in slide-in-from-top-2">
           {navLinks.map((item) => {
             const Icon = item.icon;
             const isActive =
@@ -220,7 +220,7 @@ export default function Navbar() {
                   key={item.name}
                   href={item.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-center gap-2 rounded-xl bg-teal-500/85 py-3 text-sm font-semibold text-slate-900 shadow-sm transition hover:bg-teal-600"
+                  className="glass-button flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold shadow-sm"
                 >
                   <Icon size={18} />
                   <span>{item.name}</span>
@@ -235,8 +235,8 @@ export default function Navbar() {
                 onClick={() => setMobileMenuOpen(false)}
                 className={`flex items-center justify-between rounded-xl px-4 py-3 text-sm font-medium transition ${
                   isActive
-                    ? "bg-teal-50 text-teal-700 font-semibold"
-                    : "text-slate-700 hover:bg-slate-50"
+                    ? "bg-teal-100/70 text-teal-700 font-semibold"
+                    : "text-slate-700 hover:bg-white/40"
                 }`}
               >
                 <div className="flex items-center gap-3">

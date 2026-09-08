@@ -365,7 +365,7 @@ export default function RequestsPage() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-[#fafcfb] flex flex-col">
+      <div className="min-h-screen bg-[#f7f7f3] flex flex-col">
         <Navbar />
         <div className="flex-1 flex items-center justify-center">
           <Loader2 className="animate-spin text-teal-600" size={24} />
@@ -376,10 +376,10 @@ export default function RequestsPage() {
 
   if (!user && !authLoading) {
     return (
-      <div className="min-h-screen bg-[#fafcfb] flex flex-col">
+      <div className="min-h-screen bg-[#f7f7f3] flex flex-col">
         <Navbar />
         <div className="flex-1 flex items-center justify-center px-4 py-12">
-          <div className="max-w-md w-full rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-sm">
+          <div className="glass-panel max-w-md w-full rounded-3xl p-8 text-center shadow-sm">
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-teal-50 text-teal-600 mb-4">
               <Inbox size={32} />
             </div>
@@ -404,7 +404,7 @@ export default function RequestsPage() {
   const currentList = activeTab === "incoming" ? incomingRequests : outgoingRequests;
 
   return (
-    <div className="min-h-screen bg-[#fbfcfa] flex flex-col">
+    <div className="min-h-screen bg-[#f7f7f3] flex flex-col">
       <Navbar />
 
       <main className="flex-1 mx-auto w-full max-w-4xl px-4 sm:px-6 py-8 sm:py-10">
@@ -467,7 +467,7 @@ export default function RequestsPage() {
             <p className="text-xs text-slate-500">Loading your requests...</p>
           </div>
         ) : currentList.length === 0 ? (
-          <div className="rounded-3xl border border-slate-200 bg-white p-12 text-center shadow-xs">
+          <div className="glass-panel rounded-3xl p-12 text-center shadow-xs">
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-teal-50 text-teal-600 mb-4">
               <Inbox size={30} />
             </div>
@@ -497,7 +497,7 @@ export default function RequestsPage() {
               return (
                 <div
                   key={req.id}
-                  className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6"
+                  className="glass-elevated rounded-3xl p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6"
                 >
                   <div className="space-y-3 flex-1">
                     {/* STATUS AND TYPE BADGES */}

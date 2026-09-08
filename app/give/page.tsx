@@ -533,7 +533,7 @@ export default function GivePage() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-[#f7f7f3] flex items-center justify-center">
         <div className="flex items-center gap-2 text-slate-500 font-medium text-sm">
           <Loader2 className="animate-spin text-teal-600" size={20} />
           <span>Loading...</span>
@@ -544,10 +544,10 @@ export default function GivePage() {
 
   if (!user && !authLoading) {
     return (
-      <div className="min-h-screen bg-[#fafcfb] flex flex-col">
+      <div className="min-h-screen bg-[#f7f7f3] flex flex-col">
         <Navbar />
         <div className="flex-1 flex items-center justify-center px-4 py-12">
-          <div className="max-w-md w-full rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-sm">
+          <div className="glass-panel max-w-md w-full rounded-3xl p-8 text-center shadow-sm">
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-teal-50 text-teal-600 mb-4">
               <Gift size={32} />
             </div>
@@ -558,7 +558,7 @@ export default function GivePage() {
             <div className="mt-6 flex flex-col gap-3">
               <Link
                 href="/login?redirect=/give"
-                className="rounded-xl bg-teal-500 py-3 font-semibold text-white hover:bg-teal-600 transition"
+                className="glass-button rounded-xl py-3 font-semibold transition"
               >
                 Log In
               </Link>
@@ -578,10 +578,10 @@ export default function GivePage() {
   // Published Success State
   if (publishedId) {
     return (
-      <div className="min-h-screen bg-[#fafcfb] flex flex-col">
+      <div className="min-h-screen bg-[#f7f7f3] flex flex-col">
         <Navbar />
         <section className="flex-1 flex items-center justify-center px-4 py-12">
-          <div className="w-full max-w-lg rounded-3xl border border-slate-200 bg-white p-8 sm:p-10 text-center shadow-xl">
+          <div className="glass-panel w-full max-w-lg rounded-3xl p-8 sm:p-10 text-center shadow-xl">
             <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-teal-50 text-teal-600">
               <CheckCircle2 size={44} />
             </div>
@@ -603,7 +603,7 @@ export default function GivePage() {
             <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
               <Link
                 href={`/marketplace/${publishedId}`}
-                className="rounded-xl bg-teal-500 px-6 py-3 text-sm font-semibold text-white transition hover:bg-teal-600"
+                className="glass-button rounded-xl px-6 py-3 text-sm font-semibold transition"
               >
                 View Listing
               </Link>
@@ -642,7 +642,7 @@ export default function GivePage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#fbfcfa] flex flex-col">
+    <div className="min-h-screen bg-[#f7f7f3] flex flex-col">
       <Navbar />
 
       <main className="flex-1 mx-auto w-full max-w-3xl px-4 sm:px-6 py-8 sm:py-12">
@@ -657,7 +657,7 @@ export default function GivePage() {
 
         <form
           onSubmit={handleSubmit}
-          className="rounded-3xl border border-slate-200 bg-white p-6 sm:p-10 shadow-sm space-y-7"
+          className="glass-panel rounded-3xl p-6 sm:p-10 shadow-sm space-y-7"
         >
           {submitError && (
             <div className="rounded-2xl border border-red-200 bg-red-50 p-4 flex items-start gap-3">
@@ -887,7 +887,7 @@ export default function GivePage() {
           <button
             type="submit"
             disabled={uploading}
-            className="w-full rounded-2xl bg-teal-500 py-4 font-bold text-white shadow-sm transition hover:bg-teal-600 disabled:opacity-60 flex items-center justify-center gap-2"
+            className="glass-button w-full rounded-2xl py-4 font-bold shadow-sm transition disabled:opacity-60 flex items-center justify-center gap-2"
           >
             {uploading ? (
               <>

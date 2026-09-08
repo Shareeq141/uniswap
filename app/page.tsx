@@ -77,13 +77,13 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-white text-slate-900">
+    <main className="min-h-screen bg-[#f7f7f3] text-slate-900">
       <Navbar />
 
       {/* HERO */}
-      <section className="mx-auto grid max-w-7xl gap-12 px-6 py-20 md:grid-cols-2 md:items-center">
+      <section className="glass-panel mx-3 mt-8 grid max-w-7xl gap-12 px-6 py-16 sm:mx-auto sm:px-10 md:grid-cols-2 md:items-center md:py-20">
         <div>
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-teal-100 bg-teal-50 px-4 py-2 text-sm font-medium text-teal-700">
+          <div className="glass-pill mb-6 inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-teal-700">
             <Sparkles size={16} />
             The free student-to-student marketplace
           </div>
@@ -101,7 +101,7 @@ export default function Home() {
           <div className="mt-8 flex flex-wrap gap-4">
             <Link
               href="/marketplace"
-              className="inline-flex items-center gap-2 rounded-xl bg-teal-400 px-6 py-3.5 font-semibold text-white hover:bg-teal-500"
+              className="glass-button inline-flex items-center gap-2 rounded-xl px-6 py-3.5 font-semibold"
             >
               Start Swiping
               <ArrowRight size={18} />
@@ -109,7 +109,7 @@ export default function Home() {
 
             <Link
               href={user ? "/give" : "/login"}
-              className="rounded-xl border border-slate-200 px-6 py-3.5 font-semibold text-slate-700 hover:bg-slate-50"
+              className="glass-control rounded-xl px-6 py-3.5 font-semibold text-slate-700 hover:bg-white/40"
             >
               Give an Item
             </Link>
@@ -118,9 +118,9 @@ export default function Home() {
         </div>
 
         {/* FEATURE CARD */}
-        <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5 shadow-sm">
-          <div className="overflow-hidden rounded-2xl bg-white">
-            <div className="relative flex h-80 items-center justify-center bg-gradient-to-b from-white to-slate-100">
+        <div className="glass-elevated rounded-3xl p-5 shadow-sm">
+          <div className="glass-surface overflow-hidden rounded-2xl">
+            <div className="relative flex h-80 items-center justify-center bg-slate-100">
               <span className="absolute left-5 top-5 rounded-full bg-teal-400 px-4 py-2 text-sm font-semibold text-white">
                 GIVE AWAY
               </span>
@@ -175,7 +175,7 @@ export default function Home() {
       </section>
 
       {/* CATEGORIES */}
-      <section className="border-t border-slate-100 bg-slate-50 py-20">
+      <section className="border-t border-white/60 bg-[#f1f3ee] py-20">
         <div className="mx-auto max-w-7xl px-6">
           <div className="mb-10 flex items-end justify-between">
             <div>
@@ -207,7 +207,7 @@ export default function Home() {
                 <Link
                   key={category.name}
                   href="/marketplace"
-                  className="group rounded-2xl border border-slate-200 bg-white p-6 transition hover:-translate-y-1 hover:shadow-md"
+                  className="glass-elevated group rounded-2xl p-6"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-teal-50 text-teal-500">
@@ -252,7 +252,7 @@ export default function Home() {
           </div>
 
           <div className="mt-12 grid gap-8 md:grid-cols-3">
-            <div className="rounded-2xl border border-slate-100 p-8 text-center">
+            <div className="glass-surface rounded-2xl p-8 text-center">
               <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-teal-50 text-xl font-bold text-teal-500">
                 1
               </div>
@@ -266,7 +266,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="rounded-2xl border border-slate-100 p-8 text-center">
+            <div className="glass-surface rounded-2xl p-8 text-center">
               <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-teal-50 text-xl font-bold text-teal-500">
                 2
               </div>
@@ -280,7 +280,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="rounded-2xl border border-slate-100 p-8 text-center">
+            <div className="glass-surface rounded-2xl p-8 text-center">
               <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-teal-50 text-xl font-bold text-teal-500">
                 3
               </div>
