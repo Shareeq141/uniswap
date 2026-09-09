@@ -385,6 +385,23 @@ export default function Home() {
             </Link>
           </div>
         </div>
+
+        <div className="glass-surface mx-auto mt-8 flex max-w-7xl flex-col gap-5 rounded-3xl px-6 py-6 text-center sm:px-8 md:flex-row md:items-center md:justify-between md:text-left">
+          <div>
+            <p className="text-base font-semibold tracking-tight text-slate-900">UniSwap</p>
+            <p className="mt-1 text-xs font-medium uppercase tracking-[0.2em] text-slate-500">Campus Exchange</p>
+          </div>
+
+          <div className="flex flex-col items-center gap-2 text-sm md:items-end">
+            <p className="font-medium text-slate-700">Designed &amp; Developed by Shareeq Shaik</p>
+            <a
+              href="mailto:shareeqshaik191@gmail.com"
+              className="text-xs text-slate-500 transition hover:text-slate-900"
+            >
+              shareeqshaik191@gmail.com
+            </a>
+          </div>
+        </div>
       </footer>
     </main>
   );
