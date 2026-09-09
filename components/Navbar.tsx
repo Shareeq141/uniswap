@@ -78,7 +78,7 @@ export default function Navbar() {
             <span className="text-xl font-bold tracking-tight text-slate-900 leading-none">
               UniSwap
             </span>
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-teal-700">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
               Campus Exchange
             </span>
           </div>
@@ -111,11 +111,11 @@ export default function Navbar() {
                 href={item.href}
                 className={`relative inline-flex items-center gap-2 rounded-xl px-3.5 py-2 text-sm font-medium transition ${
                   isActive
-                    ? "bg-teal-100/70 text-teal-700 font-semibold"
+                    ? "bg-slate-900 text-white font-semibold shadow-sm"
                     : "text-slate-600 hover:bg-white/40 hover:text-slate-900"
                 }`}
               >
-                <Icon size={17} className={isActive ? "text-teal-600" : "text-slate-400"} />
+                <Icon size={17} className={isActive ? "text-white" : "text-slate-400"} />
                 <span>{item.name}</span>
 
                 {/* UNREAD BADGE */}
@@ -242,12 +242,12 @@ export default function Navbar() {
                 onClick={() => setMobileMenuOpen(false)}
                 className={`flex items-center justify-between rounded-xl px-4 py-3 text-sm font-medium transition ${
                   isActive
-                    ? "bg-teal-100/70 text-teal-700 font-semibold"
+                    ? "bg-slate-900 text-white font-semibold shadow-sm"
                     : "text-slate-700 hover:bg-white/40"
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <Icon size={18} className={isActive ? "text-teal-600" : "text-slate-400"} />
+                  <Icon size={18} className={isActive ? "text-white" : "text-slate-400"} />
                   <span>{item.name}</span>
                 </div>
 

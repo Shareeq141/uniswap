@@ -120,7 +120,7 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-[#f7f7f3] text-slate-900">
+    <main className="min-h-screen bg-[#f7f8f9] text-slate-900">
       <Navbar />
 
       {/* HERO */}
@@ -245,7 +245,7 @@ export default function Home() {
       </section>
 
       {/* CATEGORIES */}
-      <section className="border-t border-white/60 bg-[#f1f3ee] py-20">
+      <section className="border-t border-white/60 bg-[#eef0f2] py-20">
         <div className="mx-auto max-w-7xl px-6">
           <div className="mb-10 flex items-end justify-between">
             <div>
