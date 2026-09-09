@@ -18,7 +18,7 @@ import {
   X,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import { isSafePublicImageUrl } from "@/lib/utils";
+import { formatListingAge, isSafePublicImageUrl } from "@/lib/utils";
 import { useAuth } from "@/lib/auth-context";
 import { addWishlistItem, fetchWishlistListingIds, removeWishlistItem } from "@/lib/wishlist";
 import Navbar from "@/components/Navbar";
@@ -349,6 +349,7 @@ export default function ListingDetailPage() {
   const isGiveAway = (item.exchange_type || item.type || "").toLowerCase().includes("give");
   const photos = (item.images || []).filter(isSafePublicImageUrl);
   const isOwner = user?.id === item.owner_id;
+  const listingAge = formatListingAge(item.created_at);
 
   return (
     <div className="min-h-screen bg-[#f7f7f3] flex flex-col">
@@ -455,6 +456,7 @@ export default function ListingDetailPage() {
                 <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 leading-tight">
                   {item.title}
                 </h1>
+                {listingAge && <p className="mt-2 text-xs text-slate-400">{listingAge}</p>}
               </div>
 
               {/* WHAT I HAVE / WHAT I WANT (FOR SWAP ONLY) */}
