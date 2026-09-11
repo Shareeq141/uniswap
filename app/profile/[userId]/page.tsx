@@ -166,9 +166,11 @@ export default function PublicProfilePage() {
               {profile.roll_number && (
                 <p className="mt-3 text-sm font-medium text-slate-600">Roll Number: {profile.roll_number}</p>
               )}
-              <p className="mt-3 max-w-2xl whitespace-pre-wrap text-sm leading-7 text-slate-600">
-                {profile.bio?.trim() || "No bio provided."}
-              </p>
+              {profile.bio?.trim() && (
+                <p className="mt-3 max-w-2xl whitespace-pre-wrap text-sm leading-7 text-slate-600">
+                  {profile.bio}
+                </p>
+              )}
             </div>
           </div>
           <div className="mt-6 border-t border-slate-100 pt-5">
