@@ -26,7 +26,18 @@ import ProfileAvatar, { getProfileDisplayName } from "@/components/ProfileAvatar
 
 const PROFILE_IMAGE_BUCKET = "listing-images";
 const MAX_PROFILE_IMAGE_SIZE = 5 * 1024 * 1024;
-const YEAR_OPTIONS = ["1st Year", "2nd Year", "3rd Year", "4th Year", "5th Year", "Graduate", "Other"];
+const YEAR_OPTIONS = [
+  { value: "1", label: "1st Year" },
+  { value: "2", label: "2nd Year" },
+  { value: "3", label: "3rd Year" },
+  { value: "4", label: "4th Year" },
+  { value: "5", label: "5th Year" },
+] as const;
+
+function getYearLabel(value: number | null | undefined) {
+  if (value === null || value === undefined) return "Year not provided";
+  return YEAR_OPTIONS.find((option) => Number(option.value) === value)?.label || `${value} Year`;
+}
 
 function getStoragePath(publicUrl: string | null | undefined) {
   if (!publicUrl) return null;
@@ -204,7 +215,7 @@ export default function ProfilePage() {
     setCollegeDraft(profile?.campus?.trim() || "");
     setRollNumberDraft("");
     setDepartmentDraft(profile?.department?.trim() || "");
-    setYearDraft(profile?.year_of_study?.trim() || "");
+    setYearDraft(profile?.year_of_study === null || profile?.year_of_study === undefined ? "" : String(profile.year_of_study));
     setBioDraft(profile?.bio?.trim() || "");
     setSelectedPhoto(null);
     setPhotoPreview(null);
@@ -256,6 +267,7 @@ export default function ProfilePage() {
     const rollNumber = rollNumberDraft.trim().replace(/\s+/g, " ");
     const department = departmentDraft.trim().replace(/\s+/g, " ");
     const yearOfStudy = yearDraft.trim();
+    const yearOfStudyValue = yearOfStudy === "" ? null : Number.parseInt(yearOfStudy, 10);
     const bio = bioDraft.trim();
     if (!fullName) {
       setProfileError("Please enter your name.");
@@ -265,7 +277,7 @@ export default function ProfilePage() {
       setProfileError("One or more profile fields are too long.");
       return;
     }
-    if (yearOfStudy && !YEAR_OPTIONS.includes(yearOfStudy)) {
+    if (yearOfStudyValue !== null && (!Number.isInteger(yearOfStudyValue) || !YEAR_OPTIONS.some((option) => Number(option.value) === yearOfStudyValue))) {
       setProfileError("Please choose a valid year of study.");
       return;
     }
@@ -321,7 +333,7 @@ export default function ProfilePage() {
         p_last_name: lastName,
         p_campus: college || null,
         p_department: department || null,
-        p_year_of_study: yearOfStudy || null,
+        p_year_of_study: yearOfStudyValue,
         p_bio: bio || null,
         p_avatar_url: nextAvatarUrl,
         p_roll_number: rollNumber || null,
@@ -406,7 +418,7 @@ export default function ProfilePage() {
                 <div className="mt-2 flex flex-wrap gap-x-4 gap-y-2 text-sm text-slate-500">
                   <span className="inline-flex items-center gap-1.5"><GraduationCap size={16} className="text-teal-600" />{profile?.campus?.trim() || "College not provided"}</span>
                   <span>{profile?.department?.trim() || "Department not provided"}</span>
-                  <span>{profile?.year_of_study?.trim() || "Year not provided"}</span>
+                  <span>{getYearLabel(profile?.year_of_study)}</span>
                   <span className="inline-flex items-center gap-1.5"><CalendarDays size={15} className="text-teal-600" />{formatJoinedDate(authenticatedUser.created_at)}</span>
                 </div>
               </div>
@@ -471,7 +483,7 @@ export default function ProfilePage() {
                 <label htmlFor="profile-year" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-500">Year of Study</label>
                 <select id="profile-year" value={yearDraft} onChange={(event) => setYearDraft(event.target.value)} className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-100">
                   <option value="">Select year</option>
-                  {YEAR_OPTIONS.map((year) => <option key={year} value={year}>{year}</option>)}
+                  {YEAR_OPTIONS.map((year) => <option key={year.value} value={year.value}>{year.label}</option>)}
                 </select>
               </div>
               <div className="sm:col-span-2">

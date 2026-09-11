@@ -20,7 +20,7 @@ export type UserProfile = {
   avatar_url?: string | null;
   campus?: string | null;
   department?: string | null;
-  year_of_study?: string | null;
+  year_of_study?: number | null;
   bio?: string | null;
 };
 
