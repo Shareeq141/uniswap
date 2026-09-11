@@ -502,7 +502,14 @@ export default function ListingDetailPage() {
                   </div>
                 </div>
 
-                <div className="flex items-start gap-2.5">
+                <Link
+                  href={owner?.id ? `/profile/${owner.id}` : "#"}
+                  aria-label={`View ${owner?.full_name || "Student"}'s profile`}
+                  className="flex items-start gap-2.5"
+                  onClick={(event) => {
+                    if (!owner?.id) event.preventDefault();
+                  }}
+                >
                   <ProfileAvatar profile={owner} user={null} />
                   <div>
                     <span className="text-[10px] font-bold uppercase text-slate-400">Listed By</span>
@@ -510,7 +517,7 @@ export default function ListingDetailPage() {
                       {owner?.full_name || "Student"}
                     </p>
                   </div>
-                </div>
+                </Link>
               </div>
             </div>
 

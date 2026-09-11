@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
   MessageSquare,
   Package,
@@ -31,7 +30,6 @@ type ConversationItem = {
 };
 
 export default function MessagesIndexPage() {
-  const router = useRouter();
   const { user, loading: authLoading } = useAuth();
 
   const [conversations, setConversations] = useState<ConversationItem[]>([]);
@@ -300,22 +298,29 @@ export default function MessagesIndexPage() {
         ) : (
           <div className="space-y-3">
             {conversations.map((conv) => (
-              <button
+              <div
                 key={conv.id}
-                type="button"
-                onClick={() => router.push(`/messages/${conv.id}`)}
                 className="glass-elevated w-full rounded-2xl p-4 sm:p-5 text-left transition flex items-center justify-between gap-4 shadow-2xs group"
               >
                 <div className="flex items-center gap-3.5 min-w-0">
                   {/* AVATAR */}
-                  <ProfileAvatar profile={conv.other_profile} user={null} />
+                  <Link
+                    href={`/profile/${conv.other_profile.id}`}
+                    aria-label={`View ${conv.other_name}'s profile`}
+                    className="shrink-0"
+                  >
+                    <ProfileAvatar profile={conv.other_profile} user={null} />
+                  </Link>
 
                   {/* DETAILS */}
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <h3 className="font-bold text-slate-900 text-sm truncate">
+                      <Link
+                        href={`/profile/${conv.other_profile.id}`}
+                        className="truncate font-bold text-sm text-slate-900 hover:text-teal-600"
+                      >
                         {conv.other_name}
-                      </h3>
+                      </Link>
                       {conv.unread_count > 0 && (
                         <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-teal-600 px-1 text-[10px] font-bold text-white">
                           {conv.unread_count}
@@ -323,6 +328,10 @@ export default function MessagesIndexPage() {
                       )}
                     </div>
 
+                    <Link
+                      href={`/messages/${conv.id}`}
+                      className="block min-w-0"
+                    >
                     {conv.listing_title && (
                       <div className="flex items-center gap-1 text-xs text-teal-700 font-medium truncate mt-0.5">
                         <Package size={12} className="shrink-0" />
@@ -333,11 +342,12 @@ export default function MessagesIndexPage() {
                     <p className="mt-1 text-xs text-slate-500 truncate">
                       {conv.last_message || "Start the conversation..."}
                     </p>
+                    </Link>
                   </div>
                 </div>
 
                 {/* TIMESTAMP & ARROW */}
-                <div className="flex items-center gap-2 shrink-0">
+                <Link href={`/messages/${conv.id}`} className="flex items-center gap-2 shrink-0">
                   <span className="text-[11px] text-slate-400">
                     {new Date(conv.last_message_time || conv.created_at).toLocaleDateString()}
                   </span>
@@ -345,8 +355,8 @@ export default function MessagesIndexPage() {
                     size={16}
                     className="text-slate-300 transition-transform group-hover:translate-x-1 group-hover:text-teal-600"
                   />
-                </div>
-              </button>
+                </Link>
+              </div>
             ))}
           </div>
         )}

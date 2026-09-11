@@ -22,6 +22,7 @@ export type UserProfile = {
   department?: string | null;
   year_of_study?: number | null;
   bio?: string | null;
+  show_roll_number?: boolean | null;
 };
 
 type AuthContextType = {
@@ -64,7 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, first_name, last_name, full_name, avatar_url, campus, department, year_of_study, bio")
+        .select("id, first_name, last_name, full_name, avatar_url, campus, department, year_of_study, bio, show_roll_number")
         .eq("id", userId)
         .maybeSingle();
 

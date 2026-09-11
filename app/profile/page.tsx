@@ -114,6 +114,7 @@ export default function ProfilePage() {
   const [departmentDraft, setDepartmentDraft] = useState("");
   const [yearDraft, setYearDraft] = useState("");
   const [bioDraft, setBioDraft] = useState("");
+  const [showRollNumberDraft, setShowRollNumberDraft] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [removePhoto, setRemovePhoto] = useState(false);
@@ -217,6 +218,7 @@ export default function ProfilePage() {
     setDepartmentDraft(profile?.department?.trim() || "");
     setYearDraft(profile?.year_of_study === null || profile?.year_of_study === undefined ? "" : String(profile.year_of_study));
     setBioDraft(profile?.bio?.trim() || "");
+    setShowRollNumberDraft(Boolean(profile?.show_roll_number));
     setSelectedPhoto(null);
     setPhotoPreview(null);
     setRemovePhoto(false);
@@ -337,6 +339,7 @@ export default function ProfilePage() {
         p_bio: bio || null,
         p_avatar_url: nextAvatarUrl,
         p_roll_number: rollNumber || null,
+        p_show_roll_number: showRollNumberDraft,
       });
 
       if (updateError) throw updateError;
@@ -469,7 +472,11 @@ export default function ProfilePage() {
               <div>
                 <label htmlFor="profile-roll-number" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-500">Roll Number</label>
                 <input id="profile-roll-number" value={rollNumberDraft} onChange={(event) => setRollNumberDraft(event.target.value)} maxLength={64} placeholder="Your roll number" autoComplete="off" className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-100" />
-                <p className="mt-1.5 text-xs text-slate-500">Private to you and never shown on public profiles or listings.</p>
+                <label className="mt-2.5 flex items-start gap-2 text-xs text-slate-600">
+                  <input type="checkbox" checked={showRollNumberDraft} onChange={(event) => setShowRollNumberDraft(event.target.checked)} className="mt-0.5 h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-400" />
+                  <span>Show my roll number on my public profile</span>
+                </label>
+                <p className="mt-1.5 text-xs text-slate-500">Off by default. Other users can only see it when you enable this setting.</p>
               </div>
               <div>
                 <label htmlFor="profile-college" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-500">College</label>

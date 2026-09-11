@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   year_of_study INTEGER,
   bio TEXT,
   roll_number TEXT,
+  show_roll_number BOOLEAN NOT NULL DEFAULT false,
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
@@ -30,6 +31,10 @@ ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS department TEXT;
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS year_of_study INTEGER;
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS bio TEXT;
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS roll_number TEXT;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS show_roll_number BOOLEAN;
+UPDATE public.profiles SET show_roll_number = false WHERE show_roll_number IS NULL;
+ALTER TABLE public.profiles ALTER COLUMN show_roll_number SET DEFAULT false;
+ALTER TABLE public.profiles ALTER COLUMN show_roll_number SET NOT NULL;
 
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
@@ -73,7 +78,8 @@ CREATE OR REPLACE FUNCTION public.update_my_profile(
   p_year_of_study INTEGER,
   p_bio TEXT,
   p_avatar_url TEXT,
-  p_roll_number TEXT
+  p_roll_number TEXT,
+  p_show_roll_number BOOLEAN
 )
 RETURNS VOID
 LANGUAGE plpgsql
@@ -103,7 +109,8 @@ BEGIN
       year_of_study = p_year_of_study,
       bio = NULLIF(BTRIM(p_bio), ''),
       avatar_url = NULLIF(BTRIM(p_avatar_url), ''),
-      roll_number = NULLIF(BTRIM(p_roll_number), '')
+      roll_number = NULLIF(BTRIM(p_roll_number), ''),
+      show_roll_number = COALESCE(p_show_roll_number, false)
   WHERE id = auth.uid();
 
   IF NOT FOUND THEN
@@ -112,8 +119,45 @@ BEGIN
 END;
 $$;
 
-REVOKE ALL ON FUNCTION public.update_my_profile(TEXT, TEXT, TEXT, TEXT, TEXT, INTEGER, TEXT, TEXT, TEXT) FROM PUBLIC;
-GRANT EXECUTE ON FUNCTION public.update_my_profile(TEXT, TEXT, TEXT, TEXT, TEXT, INTEGER, TEXT, TEXT, TEXT) TO authenticated;
+REVOKE ALL ON FUNCTION public.update_my_profile(TEXT, TEXT, TEXT, TEXT, TEXT, INTEGER, TEXT, TEXT, TEXT, BOOLEAN) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.update_my_profile(TEXT, TEXT, TEXT, TEXT, TEXT, INTEGER, TEXT, TEXT, TEXT, BOOLEAN) TO authenticated;
+
+CREATE OR REPLACE FUNCTION public.get_public_profile(p_profile_id UUID)
+RETURNS TABLE (
+  id UUID,
+  first_name TEXT,
+  last_name TEXT,
+  full_name TEXT,
+  avatar_url TEXT,
+  campus TEXT,
+  department TEXT,
+  year_of_study INTEGER,
+  bio TEXT,
+  roll_number TEXT,
+  created_at TIMESTAMPTZ
+)
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT p.id,
+         p.first_name,
+         p.last_name,
+         p.full_name,
+         p.avatar_url,
+         p.campus,
+         p.department,
+         p.year_of_study,
+         p.bio,
+         CASE WHEN p.show_roll_number THEN p.roll_number ELSE NULL END,
+         p.created_at
+  FROM public.profiles AS p
+  WHERE p.id = p_profile_id;
+$$;
+
+REVOKE ALL ON FUNCTION public.get_public_profile(UUID) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.get_public_profile(UUID) TO anon, authenticated;
 
 NOTIFY pgrst, 'reload schema';
 

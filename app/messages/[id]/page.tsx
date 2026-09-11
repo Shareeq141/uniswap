@@ -336,22 +336,29 @@ export default function ConversationDetailPage() {
                 <ArrowLeft size={16} />
               </button>
 
-              <div className="flex items-center gap-3">
-                <ProfileAvatar profile={conversation?.other_profile || null} user={null} />
-                <div>
-                  <h2 className="font-bold text-slate-900 text-sm leading-none">
-                    {conversation?.other_name || "Student"}
-                  </h2>
-                  {conversation?.listing_title && (
-                    <div className="flex items-center gap-1 text-[11px] text-teal-700 font-medium mt-1">
-                      <Package size={11} className="shrink-0" />
-                      <span className="truncate max-w-[200px] sm:max-w-xs">
-                        {conversation.listing_title}
-                      </span>
-                    </div>
-                  )}
+              {conversation?.other_profile?.id ? (
+                <Link href={`/profile/${conversation.other_profile.id}`} className="flex items-center gap-3 min-w-0">
+                  <ProfileAvatar profile={conversation.other_profile} user={null} />
+                  <div className="min-w-0">
+                    <h2 className="font-bold text-slate-900 text-sm leading-none">
+                      {conversation.other_name || "Student"}
+                    </h2>
+                    {conversation.listing_title && (
+                      <div className="flex items-center gap-1 text-[11px] text-teal-700 font-medium mt-1">
+                        <Package size={11} className="shrink-0" />
+                        <span className="truncate max-w-[200px] sm:max-w-xs">
+                          {conversation.listing_title}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </Link>
+              ) : (
+                <div className="flex items-center gap-3 min-w-0">
+                  <ProfileAvatar profile={conversation?.other_profile || null} user={null} />
+                  <h2 className="font-bold text-slate-900 text-sm leading-none">{conversation?.other_name || "Student"}</h2>
                 </div>
-              </div>
+              )}
             </div>
 
             {conversation?.listing_id && (
@@ -395,10 +402,19 @@ export default function ConversationDetailPage() {
                     className={`flex flex-col ${isMe ? "items-end" : "items-start"}`}
                   >
                     <div className={`flex max-w-[90%] items-end gap-2 sm:max-w-[80%] ${isMe ? "flex-row-reverse" : "flex-row"}`}>
-                      <ProfileAvatar
-                        profile={isMe ? currentProfile : conversation?.other_profile || null}
-                        user={isMe ? user : null}
-                      />
+                      {((isMe ? user?.id : conversation?.other_profile?.id) ? (
+                        <Link href={`/profile/${isMe ? user?.id : conversation?.other_profile?.id}`} aria-label={`View ${isMe ? "your" : conversation?.other_name || "Student"} profile`}>
+                          <ProfileAvatar
+                            profile={isMe ? currentProfile : conversation?.other_profile || null}
+                            user={isMe ? user : null}
+                          />
+                        </Link>
+                      ) : (
+                        <ProfileAvatar
+                          profile={isMe ? currentProfile : conversation?.other_profile || null}
+                          user={isMe ? user : null}
+                        />
+                      ))}
                       <div
                         className={`rounded-2xl px-4 py-2.5 text-xs leading-relaxed shadow-2xs sm:text-sm ${
                           isMe

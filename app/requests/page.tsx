@@ -567,13 +567,20 @@ export default function RequestsPage() {
 
                     {/* PERSON DETAILS */}
                     <div className="flex items-center gap-2 text-xs text-slate-500">
-                      <ProfileAvatar profile={req.other_profile || null} user={null} />
-                      <span>
-                        {isIncoming ? "Requested by: " : "Listed by: "}
-                        <strong className="text-slate-800">
-                          {req.other_profile?.full_name || "Student"}
-                        </strong>
-                      </span>
+                      {isIncoming ? "Requested by: " : "Listed by: "}
+                      {req.other_profile?.id ? (
+                        <Link href={`/profile/${req.other_profile.id}`} className="inline-flex items-center gap-2 hover:text-teal-700">
+                          <ProfileAvatar profile={req.other_profile} user={null} />
+                          <strong className="text-slate-800">
+                            {req.other_profile.full_name || "Student"}
+                          </strong>
+                        </Link>
+                      ) : (
+                        <span className="inline-flex items-center gap-2">
+                          <ProfileAvatar profile={req.other_profile || null} user={null} />
+                          <strong className="text-slate-800">{req.other_profile?.full_name || "Student"}</strong>
+                        </span>
+                      )}
                     </div>
                   </div>
 
