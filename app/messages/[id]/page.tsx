@@ -13,8 +13,9 @@ import {
   MessageSquare,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import { useAuth } from "@/lib/auth-context";
+import { useAuth, type UserProfile } from "@/lib/auth-context";
 import Navbar from "@/components/Navbar";
+import ProfileAvatar from "@/components/ProfileAvatar";
 
 type Message = {
   id: string;
@@ -31,13 +32,14 @@ type ConversationInfo = {
   participant_one: string;
   participant_two: string;
   other_name: string;
+  other_profile: UserProfile;
   listing_title?: string;
 };
 
 export default function ConversationDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const { user, refreshUnreadCount } = useAuth();
+  const { user, profile: currentProfile, refreshUnreadCount } = useAuth();
 
   const rawId = params?.id;
   const conversationId = Array.isArray(rawId) ? rawId[0] : (rawId as string);
@@ -90,7 +92,7 @@ export default function ConversationDetailPage() {
         let otherName = "Student";
         const { data: profile, error: profileError } = await supabase
           .from("profiles")
-          .select("full_name")
+          .select("id, full_name, avatar_url")
           .eq("id", otherUserId)
           .maybeSingle();
 
@@ -121,6 +123,7 @@ export default function ConversationDetailPage() {
         setConversation({
           ...conv,
           other_name: otherName,
+          other_profile: (profile as UserProfile | null) || { id: otherUserId, full_name: "Student", avatar_url: null },
           listing_title: listingTitle,
         });
 
@@ -334,9 +337,7 @@ export default function ConversationDetailPage() {
               </button>
 
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-teal-100 text-teal-700 font-bold text-base">
-                  {conversation?.other_name ? conversation.other_name.charAt(0).toUpperCase() : "S"}
-                </div>
+                <ProfileAvatar profile={conversation?.other_profile || null} user={null} />
                 <div>
                   <h2 className="font-bold text-slate-900 text-sm leading-none">
                     {conversation?.other_name || "Student"}
@@ -393,14 +394,20 @@ export default function ConversationDetailPage() {
                     key={msg.id}
                     className={`flex flex-col ${isMe ? "items-end" : "items-start"}`}
                   >
-                    <div
-                      className={`max-w-[80%] sm:max-w-[70%] rounded-2xl px-4 py-2.5 text-xs sm:text-sm leading-relaxed shadow-2xs ${
-                        isMe
-                          ? "bg-teal-600 text-white rounded-br-xs"
-                          : "bg-white text-slate-800 border border-slate-200 rounded-bl-xs"
-                      }`}
-                    >
-                      <p className="whitespace-pre-wrap break-words">{msg.content}</p>
+                    <div className={`flex max-w-[90%] items-end gap-2 sm:max-w-[80%] ${isMe ? "flex-row-reverse" : "flex-row"}`}>
+                      <ProfileAvatar
+                        profile={isMe ? currentProfile : conversation?.other_profile || null}
+                        user={isMe ? user : null}
+                      />
+                      <div
+                        className={`rounded-2xl px-4 py-2.5 text-xs leading-relaxed shadow-2xs sm:text-sm ${
+                          isMe
+                            ? "bg-teal-600 text-white rounded-br-xs"
+                            : "bg-white text-slate-800 border border-slate-200 rounded-bl-xs"
+                        }`}
+                      >
+                        <p className="whitespace-pre-wrap break-words">{msg.content}</p>
+                      </div>
                     </div>
 
                     <div className="mt-1 flex items-center gap-1 text-[10px] text-slate-400 px-1">

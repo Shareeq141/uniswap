@@ -15,11 +15,10 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   avatar_url TEXT,
   campus TEXT,
   department TEXT,
-  year_of_study TEXT,
+  year_of_study INTEGER,
   bio TEXT,
   roll_number TEXT,
-  created_at TIMESTAMPTZ DEFAULT now(),
-  updated_at TIMESTAMPTZ DEFAULT now()
+  created_at TIMESTAMPTZ DEFAULT now()
 );
 
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS first_name TEXT;
@@ -28,7 +27,7 @@ ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS full_name TEXT;
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS avatar_url TEXT;
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS campus TEXT;
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS department TEXT;
-ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS year_of_study TEXT;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS year_of_study INTEGER;
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS bio TEXT;
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS roll_number TEXT;
 
@@ -71,7 +70,7 @@ CREATE OR REPLACE FUNCTION public.update_my_profile(
   p_last_name TEXT,
   p_campus TEXT,
   p_department TEXT,
-  p_year_of_study TEXT,
+  p_year_of_study INTEGER,
   p_bio TEXT,
   p_avatar_url TEXT,
   p_roll_number TEXT
@@ -89,7 +88,7 @@ BEGIN
   IF length(COALESCE(p_full_name, '')) > 160
     OR length(COALESCE(p_campus, '')) > 150
     OR length(COALESCE(p_department, '')) > 150
-    OR length(COALESCE(p_year_of_study, '')) > 40
+    OR (p_year_of_study IS NOT NULL AND (p_year_of_study < 1 OR p_year_of_study > 5))
     OR length(COALESCE(p_bio, '')) > 1000
     OR length(COALESCE(p_roll_number, '')) > 64 THEN
     RAISE EXCEPTION 'One or more profile fields are too long';
@@ -101,11 +100,10 @@ BEGIN
       last_name = NULLIF(BTRIM(p_last_name), ''),
       campus = NULLIF(BTRIM(p_campus), ''),
       department = NULLIF(BTRIM(p_department), ''),
-      year_of_study = NULLIF(BTRIM(p_year_of_study), ''),
+      year_of_study = p_year_of_study,
       bio = NULLIF(BTRIM(p_bio), ''),
       avatar_url = NULLIF(BTRIM(p_avatar_url), ''),
-      roll_number = NULLIF(BTRIM(p_roll_number), ''),
-      updated_at = now()
+      roll_number = NULLIF(BTRIM(p_roll_number), '')
   WHERE id = auth.uid();
 
   IF NOT FOUND THEN
@@ -114,8 +112,8 @@ BEGIN
 END;
 $$;
 
-REVOKE ALL ON FUNCTION public.update_my_profile(TEXT, TEXT, TEXT, TEXT, TEXT, TEXT, TEXT, TEXT, TEXT) FROM PUBLIC;
-GRANT EXECUTE ON FUNCTION public.update_my_profile(TEXT, TEXT, TEXT, TEXT, TEXT, TEXT, TEXT, TEXT, TEXT) TO authenticated;
+REVOKE ALL ON FUNCTION public.update_my_profile(TEXT, TEXT, TEXT, TEXT, TEXT, INTEGER, TEXT, TEXT, TEXT) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.update_my_profile(TEXT, TEXT, TEXT, TEXT, TEXT, INTEGER, TEXT, TEXT, TEXT) TO authenticated;
 
 NOTIFY pgrst, 'reload schema';
 

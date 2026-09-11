@@ -15,11 +15,12 @@ import {
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { formatListingAge, isSafePublicImageUrl } from "@/lib/utils";
-import { useAuth } from "@/lib/auth-context";
+import { useAuth, type UserProfile } from "@/lib/auth-context";
 import { addWishlistItem, fetchWishlistListingIds, removeWishlistItem } from "@/lib/wishlist";
 import Navbar from "@/components/Navbar";
 import LiveLocationControl, { LiveLocation } from "@/components/LiveLocationControl";
 import WishlistButton from "@/components/WishlistButton";
+import ProfileAvatar from "@/components/ProfileAvatar";
 
 export type Listing = {
   id: string;
@@ -39,6 +40,7 @@ export type Listing = {
   owner_id?: string | null;
   created_at?: string | null;
   owner_name?: string;
+  owner_profile?: UserProfile | null;
 };
 
 const categories = ["All", "Calculators", "Textbooks", "Stationery", "Drafting Tools", "Lab Equipment", "Lab Coats", "Electronics", "Other"];
@@ -127,15 +129,19 @@ export default function MarketplacePage() {
         longitude: normalizeCoordinate(item.longitude, -180, 180),
       }));
       const ownerIds = Array.from(new Set(rows.map((item) => item.owner_id).filter(Boolean))) as string[];
-      let profileMap: Record<string, string> = {};
+      const profileMap = new Map<string, UserProfile>();
       if (ownerIds.length > 0) {
-        const { data: profiles, error: profilesError } = await supabase.from("profiles").select("id, full_name").in("id", ownerIds);
+        const { data: profiles, error: profilesError } = await supabase.from("profiles").select("id, full_name, avatar_url").in("id", ownerIds);
         if (profilesError) throw profilesError;
-        if (profiles) profileMap = Object.fromEntries(profiles.map((profile) => [profile.id, profile.full_name?.trim() || "Student"]));
+        if (profiles) profiles.forEach((profile) => profileMap.set(profile.id, profile as UserProfile));
       }
 
       if (requestId !== latestRequestRef.current) return;
-      setListings(rows.map((item) => ({ ...item, owner_name: item.owner_id ? profileMap[item.owner_id] || "Student" : "Student" })));
+      setListings(rows.map((item) => ({
+        ...item,
+        owner_name: item.owner_id ? profileMap.get(item.owner_id)?.full_name?.trim() || "Student" : "Student",
+        owner_profile: item.owner_id ? profileMap.get(item.owner_id) || { id: item.owner_id, full_name: "Student", avatar_url: null } : null,
+      })));
     } catch (err: unknown) {
       if (requestId !== latestRequestRef.current) return;
       console.error("Marketplace fetch error:", err);
@@ -261,7 +267,7 @@ export default function MarketplacePage() {
           const listingAge = formatListingAge(item.created_at);
           return <article key={item.id} className="glass-elevated group flex flex-col overflow-hidden rounded-3xl shadow-2xs">
             <div className="relative flex aspect-4/3 w-full items-center justify-center overflow-hidden bg-slate-100">{imageUrl ? <Image src={imageUrl} alt={item.title} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-cover transition duration-300 group-hover:scale-105" /> : <div className="text-5xl">{(item.category || "").toLowerCase().includes("calc") ? "🧮" : (item.category || "").toLowerCase().includes("book") ? "📚" : (item.category || "").toLowerCase().includes("lab") ? "🥼" : (item.category || "").toLowerCase().includes("draft") ? "📐" : (item.category || "").toLowerCase().includes("elect") ? "💻" : "📦"}</div>}<span className={`absolute left-3 top-3 rounded-full px-3 py-1 text-[11px] font-extrabold uppercase tracking-wider ${isGiveAway ? "bg-teal-500 text-white" : "bg-slate-900 text-white"}`}>{isGiveAway ? "Give Away" : "Swap"}</span><WishlistButton saved={isSaved} loading={wishlistLoadingIds.has(item.id)} onToggle={() => void toggleSaved(item.id)} className="absolute right-3 top-3 h-8 w-8 bg-white/90 text-slate-600 shadow-xs hover:text-red-500" /></div>
-            <div className="flex flex-1 flex-col p-5"><div className="flex items-start justify-between gap-2"><h3 className="line-clamp-1 text-base font-bold text-slate-900">{item.title}</h3>{item.condition && <span className="shrink-0 rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-600">{item.condition}</span>}</div>{!isGiveAway && item.swap_want && <div className="mt-2.5 rounded-xl border border-teal-100 bg-teal-50/80 p-2 text-xs"><span className="font-bold text-teal-800">What I Want: </span><span className="text-teal-900">{item.swap_want}</span></div>}<p className="mt-2 line-clamp-2 flex-1 text-xs leading-relaxed text-slate-500">{item.description || "No description provided."}</p><div className="mt-4 space-y-2 border-t border-slate-100 pt-3 text-xs text-slate-500"><div className="flex items-start gap-1.5"><GraduationCap size={14} className="mt-0.5 shrink-0 text-teal-600" /><span className="line-clamp-2"><strong className="text-slate-700">College:</strong> {college}</span></div><div className="flex items-center justify-between gap-3"><span className="text-slate-700">Listed by {item.owner_name}</span>{listingAge && <span className="shrink-0 text-slate-400">{listingAge}</span>}</div></div><Link href={`/marketplace/${item.id}`} className="mt-3 block w-full rounded-xl bg-slate-900 py-2.5 text-center text-xs font-bold text-white transition hover:bg-slate-800">View Details</Link></div>
+            <div className="flex flex-1 flex-col p-5"><div className="flex items-start justify-between gap-2"><h3 className="line-clamp-1 text-base font-bold text-slate-900">{item.title}</h3>{item.condition && <span className="shrink-0 rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-600">{item.condition}</span>}</div>{!isGiveAway && item.swap_want && <div className="mt-2.5 rounded-xl border border-teal-100 bg-teal-50/80 p-2 text-xs"><span className="font-bold text-teal-800">What I Want: </span><span className="text-teal-900">{item.swap_want}</span></div>}<p className="mt-2 line-clamp-2 flex-1 text-xs leading-relaxed text-slate-500">{item.description || "No description provided."}</p><div className="mt-4 space-y-2 border-t border-slate-100 pt-3 text-xs text-slate-500"><div className="flex items-start gap-1.5"><GraduationCap size={14} className="mt-0.5 shrink-0 text-teal-600" /><span className="line-clamp-2"><strong className="text-slate-700">College:</strong> {college}</span></div><div className="flex items-center justify-between gap-3"><div className="flex min-w-0 items-center gap-2"><ProfileAvatar profile={item.owner_profile || null} user={null} /><span className="truncate text-slate-700">Listed by {item.owner_name}</span></div>{listingAge && <span className="shrink-0 text-slate-400">{listingAge}</span>}</div></div><Link href={`/marketplace/${item.id}`} className="mt-3 block w-full rounded-xl bg-slate-900 py-2.5 text-center text-xs font-bold text-white transition hover:bg-slate-800">View Details</Link></div>
           </article>;
         })}</div>}
       </main>

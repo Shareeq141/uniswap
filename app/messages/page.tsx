@@ -12,8 +12,9 @@ import {
   Inbox,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import { useAuth } from "@/lib/auth-context";
+import { useAuth, type UserProfile } from "@/lib/auth-context";
 import Navbar from "@/components/Navbar";
+import ProfileAvatar from "@/components/ProfileAvatar";
 
 type ConversationItem = {
   id: string;
@@ -22,6 +23,7 @@ type ConversationItem = {
   participant_two: string;
   created_at: string;
   other_name: string;
+  other_profile: UserProfile;
   listing_title?: string;
   last_message?: string;
   last_message_time?: string;
@@ -83,19 +85,17 @@ export default function MessagesIndexPage() {
         );
 
         // 2. Fetch profiles
-        const profileMap = new Map<string, string>();
+        const profileMap = new Map<string, UserProfile>();
         if (otherUserIds.length > 0) {
           const { data: profiles, error: profilesError } = await supabase
             .from("profiles")
-            .select("id, full_name")
+            .select("id, full_name, avatar_url")
             .in("id", otherUserIds);
 
           if (profilesError) throw profilesError;
 
           if (profiles) {
-            profiles.forEach((p) =>
-              profileMap.set(p.id, p.full_name?.trim() || "Student")
-            );
+            profiles.forEach((p) => profileMap.set(p.id, p as UserProfile));
           }
         }
 
@@ -152,7 +152,8 @@ export default function MessagesIndexPage() {
 
           return {
             ...c,
-            other_name: profileMap.get(otherId) || "Student",
+            other_name: profileMap.get(otherId)?.full_name?.trim() || "Student",
+            other_profile: profileMap.get(otherId) || { id: otherId, full_name: "Student", avatar_url: null },
             listing_title: c.listing_id ? listingMap.get(c.listing_id) : undefined,
             last_message: lastMsg?.content,
             last_message_time: lastMsg?.time || c.created_at,
@@ -307,9 +308,7 @@ export default function MessagesIndexPage() {
               >
                 <div className="flex items-center gap-3.5 min-w-0">
                   {/* AVATAR */}
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-teal-100 text-teal-700 font-bold text-lg">
-                    {conv.other_name.charAt(0).toUpperCase()}
-                  </div>
+                  <ProfileAvatar profile={conv.other_profile} user={null} />
 
                   {/* DETAILS */}
                   <div className="min-w-0 flex-1">

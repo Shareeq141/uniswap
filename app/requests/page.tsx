@@ -8,7 +8,6 @@ import {
   Send,
   Check,
   X,
-  User,
   Package,
   MessageCircle,
   Clock,
@@ -18,8 +17,9 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import { useAuth } from "@/lib/auth-context";
+import { useAuth, type UserProfile } from "@/lib/auth-context";
 import Navbar from "@/components/Navbar";
+import ProfileAvatar from "@/components/ProfileAvatar";
 
 type RequestRecord = {
   id: string;
@@ -44,6 +44,7 @@ type RequestRecord = {
   other_profile?: {
     id: string;
     full_name?: string | null;
+    avatar_url?: string | null;
   } | null;
 };
 
@@ -190,18 +191,18 @@ export default function RequestsPage() {
         )
       );
 
-      let profileMap = new Map<string, { id: string; full_name: string }>();
+      let profileMap = new Map<string, UserProfile>();
       if (profileIds.length > 0) {
         requestStage = "profiles.select";
         const { data: profilesData, error: profilesError } = await supabase
           .from("profiles")
-          .select("id, full_name")
+          .select("id, full_name, avatar_url")
           .in("id", profileIds);
 
         if (profilesError) throw profilesError;
 
         if (profilesData) {
-          profileMap = new Map(profilesData.map((p) => [p.id, p]));
+          profileMap = new Map(profilesData.map((p) => [p.id, p as UserProfile]));
         }
       }
 
@@ -212,7 +213,7 @@ export default function RequestsPage() {
         return {
           ...r,
           listing: listingMap.get(r.listing_id) || null,
-          other_profile: profileMap.get(otherPersonId) || { id: otherPersonId, full_name: "Student" },
+          other_profile: profileMap.get(otherPersonId) || { id: otherPersonId, full_name: "Student", avatar_url: null },
         };
       });
 
@@ -566,7 +567,7 @@ export default function RequestsPage() {
 
                     {/* PERSON DETAILS */}
                     <div className="flex items-center gap-2 text-xs text-slate-500">
-                      <User size={14} className="text-slate-400" />
+                      <ProfileAvatar profile={req.other_profile || null} user={null} />
                       <span>
                         {isIncoming ? "Requested by: " : "Listed by: "}
                         <strong className="text-slate-800">

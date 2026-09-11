@@ -7,7 +7,6 @@ import { useParams, useRouter } from "next/navigation";
 import {
   ArrowLeft,
   GraduationCap,
-  User,
   MessageSquare,
   Gift,
   ArrowLeftRight,
@@ -23,6 +22,7 @@ import { useAuth } from "@/lib/auth-context";
 import { addWishlistItem, fetchWishlistListingIds, removeWishlistItem } from "@/lib/wishlist";
 import Navbar from "@/components/Navbar";
 import WishlistButton from "@/components/WishlistButton";
+import ProfileAvatar from "@/components/ProfileAvatar";
 
 type Listing = {
   id: string;
@@ -48,6 +48,7 @@ type Profile = {
   full_name: string | null;
   first_name?: string | null;
   last_name?: string | null;
+  avatar_url?: string | null;
 };
 
 type ExistingRequest = {
@@ -114,7 +115,7 @@ export default function ListingDetailPage() {
         if (data.owner_id) {
           const { data: profileData, error: profileError } = await supabase
             .from("profiles")
-            .select("id, full_name, first_name, last_name")
+            .select("id, full_name, first_name, last_name, avatar_url")
             .eq("id", data.owner_id)
             .maybeSingle();
 
@@ -502,7 +503,7 @@ export default function ListingDetailPage() {
                 </div>
 
                 <div className="flex items-start gap-2.5">
-                  <User size={18} className="text-teal-600 shrink-0 mt-0.5" />
+                  <ProfileAvatar profile={owner} user={null} />
                   <div>
                     <span className="text-[10px] font-bold uppercase text-slate-400">Listed By</span>
                     <p className="text-xs font-bold text-slate-800 line-clamp-1">
