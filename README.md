@@ -39,6 +39,8 @@ For an existing project that already ran the initial schema, also run
 to add persisted request notifications and tighten storage/request/message safeguards,
 then run [`supabase/migrations/20260908_production_hardening.sql`](./supabase/migrations/20260908_production_hardening.sql)
 to enforce request targets and recipient-only message read updates.
+For the editable student profile fields and private roll number, also run
+[`supabase/migrations/20260912_profile_fields.sql`](./supabase/migrations/20260912_profile_fields.sql).
 
 ## Local development and validation
 
