@@ -309,52 +309,27 @@ export default function RequestsPage() {
     setError(null);
 
     try {
-      const otherUserId = req.owner_id === user.id ? req.requester_id : req.owner_id;
-
-      // 1. Look for existing conversation between these two users for this listing
-      const { data: conv1, error: err1 } = await supabase
-        .from("conversations")
-        .select("id")
-        .eq("listing_id", req.listing_id)
-        .eq("participant_one", user.id)
-        .eq("participant_two", otherUserId)
-        .maybeSingle();
-
-      if (err1) throw err1;
-      if (conv1?.id) {
-        router.push(`/messages/${conv1.id}`);
-        return;
-      }
-
-      const { data: conv2, error: err2 } = await supabase
-        .from("conversations")
-        .select("id")
-        .eq("listing_id", req.listing_id)
-        .eq("participant_one", otherUserId)
-        .eq("participant_two", user.id)
-        .maybeSingle();
-
-      if (err2) throw err2;
-      if (conv2?.id) {
-        router.push(`/messages/${conv2.id}`);
-        return;
-      }
-
-      // 2. Create conversation if none exists
-      const { data: newConv, error: createError } = await supabase
-        .from("conversations")
-        .insert({
-          listing_id: req.listing_id,
-          participant_one: user.id,
-          participant_two: otherUserId,
-        })
-        .select("id")
-        .single();
+      const { data: conversationRows, error: createError } = await supabase.rpc(
+        "create_or_get_conversation_for_request",
+        { p_request_id: req.id }
+      );
 
       if (createError) throw createError;
 
-      // Redirect to proper messages route
-      router.push(`/messages/${newConv.id}`);
+      const conversationRow = Array.isArray(conversationRows)
+        ? conversationRows[0]
+        : conversationRows;
+
+      if (
+        !conversationRow ||
+        typeof conversationRow !== "object" ||
+        !("id" in conversationRow) ||
+        typeof conversationRow.id !== "string"
+      ) {
+        throw new Error("The conversation could not be opened.");
+      }
+
+      router.push(`/messages/${conversationRow.id}`);
     } catch (err: unknown) {
       console.error("Open conversation error:", err);
       const message = err instanceof Error ? err.message : "Could not open conversation.";
