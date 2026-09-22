@@ -103,6 +103,7 @@ function SignupForm() {
         email: cleanEmail,
         password,
         options: {
+          emailRedirectTo: `${window.location.origin}/verified`,
           data: {
             first_name: cleanFirstName,
             last_name: cleanLastName,
