@@ -103,7 +103,7 @@ function SignupForm() {
         email: cleanEmail,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/verified`,
+          emailRedirectTo: `${window.location.origin}/auth/callback?next=/verified`,
           data: {
             first_name: cleanFirstName,
             last_name: cleanLastName,

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { AlertCircle, ArrowRight, CheckCircle2, Loader2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
-type VerificationState = "checking" | "verified" | "invalid";
+type VerificationState = "checking" | "verified" | "session-unavailable" | "invalid";
 
 export default function VerifiedPage() {
   const [state, setState] = useState<VerificationState>("checking");
@@ -20,7 +20,13 @@ export default function VerifiedPage() {
         const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
 
         if (exchangeError) {
-          if (active) setState("invalid");
+          const exchangeMessage = exchangeError.message.toLowerCase();
+          const missingVerifier =
+            exchangeMessage.includes("code verifier") ||
+            exchangeMessage.includes("pkce") ||
+            exchangeMessage.includes("flow state");
+
+          if (active) setState(missingVerifier ? "session-unavailable" : "invalid");
           return;
         }
       }
@@ -63,6 +69,22 @@ export default function VerifiedPage() {
           </p>
           <Link href="/login" className="glass-button mt-6 inline-flex rounded-xl px-5 py-3 text-sm font-bold">
             Continue to UniSwap
+          </Link>
+        </div>
+      </main>
+    );
+  }
+
+  if (state === "session-unavailable") {
+    return (
+      <main className="min-h-screen bg-[#f7f7f3] flex items-center justify-center px-6 py-12">
+        <div className="glass-panel w-full max-w-md rounded-3xl p-8 text-center shadow-xs">
+          <h1 className="text-2xl font-serif font-semibold text-slate-800">Continue in UniSwap</h1>
+          <p className="mt-3 text-sm leading-6 text-slate-500">
+            This email link was opened in a different browser context, so Supabase could not create a session here. Return to the browser where you started signup, or sign in to continue.
+          </p>
+          <Link href="/login" className="glass-button mt-6 inline-flex rounded-xl px-5 py-3 text-sm font-bold">
+            Sign in to UniSwap
           </Link>
         </div>
       </main>
